@@ -1,0 +1,25 @@
+# AICTE approval orchestration and compliance
+
+An integration-first project for approval workflow coordination, EVC scheduling, undertaking compliance, document validity, reminders and audit. Regulatory scrutiny and decisions remain with competent authorities.
+
+## Current status
+
+Discovery is in progress. This repository currently contains planning and research, with no application runtime or live AICTE integration. The initial prototype will use a clearly labelled synthetic reference host unless an authorised host is supplied. Proposed technology choices are not installed or implemented by this documentation setup.
+
+## Project documents
+
+- [Master PRD](./files/MASTER_PRD.md)
+- [Delivery backlog and progress](./files/tickets.md)
+- [Consolidated research context](./files/AICTE_Workflow_Master_Context.md)
+- [Host and repository inventory](./docs/discovery/host-inventory.md)
+- [Contribution and branch workflow](./CONTRIBUTING.md)
+
+## Getting started
+
+Clone the repository and read the PRD, backlog and discovery inventory. There are no application install/start commands yet. Runtime scaffolding follows the stack/transaction proof; do not assume the presence of a Java service, UI, database or Docker environment.
+
+Use synthetic data for development. Do not commit credentials, government records, institution evidence or private exports.
+
+## Delivery workflow
+
+Each completed subticket is developed on a new branch, committed with a descriptive message without ticket identifiers, pushed, merged into `main` and followed by a push of `main`. The backlog and discovery evidence are updated with the work. See the contribution guide for exact steps and safeguards.
