@@ -26,6 +26,12 @@ runtime-data/
 uploads/
 backups/
 
+# Regulatory research downloads/extractions and local review artefacts
+# Commit source metadata, checksums and synthetic fixtures instead of bundles.
+/research-downloads/
+/regulatory-cache/
+/review-exports/
+
 # Editor and OS state
 .idea/
 .vscode/
