@@ -26,13 +26,17 @@ runtime-data/
 uploads/
 backups/
 
-# Supporting documents and research stay local; publish code/test assets only.
+# Project planning/research stays local; implementation docs such as README
+# remain publishable alongside code and executable tests.
 /files/
-/docs/
-*.md
+/docs/discovery/
+/docs/evaluation/
+/docs/product/
+/docs/regulatory/
+/MASTER_PRD.md
+/tickets.md
 *.docx
 *.pdf
-/README*
 /CONTRIBUTING*
 /config/discovery/
 /config/evaluation/
