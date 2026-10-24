@@ -1,0 +1,7 @@
+# Only build inputs enter the context; no secrets, caches or planning artefacts.
+*
+!pom.xml
+!stack-proof/
+!stack-proof/**
+stack-proof/target/
+stack-proof/**/*.log

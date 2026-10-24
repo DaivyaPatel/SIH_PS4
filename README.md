@@ -57,7 +57,7 @@ Surefire reports are written under `stack-proof/target/surefire-reports/`. Gener
 
 Audit/outbox tables here store transactional proof intents only. This does not implement a production audit security model, delivery worker, regulatory authorisation or full EVC optimisation.
 
-Verified locally on Windows amd64 with JDK 21: all eight Java tests pass with no skips. Linux container verification is a separate check; local Windows success does not establish container compatibility.
+Verified locally on Windows amd64 with JDK 21: all eight Java tests pass with no skips. The build workflow separately checks Windows and the Linux amd64 container; local Windows success alone does not establish container compatibility.
 
 ## Run the packaged native probe
 
@@ -68,6 +68,19 @@ java -jar stack-proof/target/stack-proof-0.1.0-SNAPSHOT.jar --probe-native
 ```
 
 The probe loads the JNI libraries from the OR-Tools platform jars and solves one feasible and one infeasible model without a database. The default non-web Spring application instead requires `PROOF_DATABASE_URL`, `PROOF_DATABASE_USER` and `PROOF_DATABASE_PASSWORD`. It creates proof tables and Flowable schemas automatically: use only a new disposable test database, never an existing institution or production database. No HTTP listener is exposed.
+
+## Linux container verification
+
+With Docker available:
+
+```sh
+docker build --platform linux/amd64 --tag aicte-stack-proof .
+docker run --rm --network none aicte-stack-proof
+```
+
+The build runs the Java suite, including real PostgreSQL, as a non-root user. The final JRE-only image runs the packaged native solver as a non-root user without network access. No image is published. Base images use version tags for this proof; pin approved digests before an actual pilot deployment.
+
+[GitHub Actions](./.github/workflows/stack-proof.yml) executes the Windows Java suite and the Linux container build/probe when relevant source or build files change. It uses read-only repository permissions and requires no deployment credentials.
 
 ## Synthetic policy specification
 

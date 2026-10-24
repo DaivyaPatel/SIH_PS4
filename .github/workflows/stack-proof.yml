@@ -1,0 +1,52 @@
+name: Stack compatibility proof
+
+on:
+  push:
+    paths:
+      - 'pom.xml'
+      - 'stack-proof/**'
+      - '.mvn/**'
+      - 'mvnw*'
+      - 'Dockerfile'
+      - '.dockerignore'
+      - '.github/workflows/stack-proof.yml'
+  pull_request:
+    paths:
+      - 'pom.xml'
+      - 'stack-proof/**'
+      - '.mvn/**'
+      - 'mvnw*'
+      - 'Dockerfile'
+      - '.dockerignore'
+      - '.github/workflows/stack-proof.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows-java:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Verify PostgreSQL, engines, transactions and native solver
+        run: .\mvnw.cmd --batch-mode --no-transfer-progress verify
+
+  linux-container:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test as a non-root container user
+        run: docker build --platform linux/amd64 --tag aicte-stack-proof .
+      - name: Run packaged native solver without network access
+        run: docker run --rm --network none aicte-stack-proof

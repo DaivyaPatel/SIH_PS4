@@ -24,6 +24,7 @@ __pycache__/
 hs_err_pid*.log
 replay_pid*.log
 *.hprof
+*.jfr
 
 # Local runtime data and evidence (never commit institutional records)
 .local/
