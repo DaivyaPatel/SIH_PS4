@@ -12,5 +12,13 @@
 *.sh text eol=lf
 *.ps1 text eol=lf
 *.py text eol=lf
+*.xml text eol=lf
+*.dmn text eol=lf
+*.sql text eol=lf
+*.properties text eol=lf
+mvnw text eol=lf
+mvnw.cmd text eol=crlf
+Dockerfile text eol=lf
+.dockerignore text eol=lf
 *.docx binary
 *.pdf binary

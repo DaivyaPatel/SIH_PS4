@@ -1,72 +1,107 @@
 # AICTE Approval Workflow Automation
 
-An integration-first project for coordinating approval workflows, EVC scheduling, institutional compliance, document validity, alerts and audit trails. Regulatory verification and decisions remain with the competent authorities.
+An integration-first project for approval-workflow coordination, EVC scheduling, institutional compliance, document validity, alerts and traceable actions. Regulatory verification and decisions remain with the competent authorities.
 
-## Implementation status
+## Current implementation
 
-The repository currently contains an executable synthetic policy specification and its validation script. The application backend, database, web interface, persistent timers and external integrations have not been implemented yet.
+The Java stack-proof module exercises Spring-managed Flowable BPMN/DMN engines on a shared PostgreSQL datasource and transaction manager. It includes a synthetic human review task, a persisted timer, case/audit/outbox writes and native OR-Tools scheduling probes.
 
-The existing code validates:
+This is a compatibility proof, not an approval portal or production workflow backend. There are no public application endpoints, real institution records, external notifications or autonomous statutory decisions. All bundled workflows, users and dates are synthetic.
 
-- Three configurable route examples: scrutiny-only, scrutiny with EVC, and EVC-only.
-- Conditional hearing and appeal branches, deficiency responses and re-review.
-- Role, prerequisite, reason and source-confirmation guards.
-- Working-day calculations and deadline boundaries.
-- Submission versus verification status, document validity and renewal examples.
-- Notification recipient classification for pending actions and technical failures.
+## Stack
 
-All bundled records and rules are synthetic. They are test inputs, not approved AICTE regulations or live institutional records.
+| Component | Pinned version | Licence |
+|---|---|---|
+| Java / OpenJDK-compatible runtime | 21 | Distribution-specific; OpenJDK GPLv2 with Classpath Exception |
+| Maven wrapper distribution | 3.9.11 | Apache 2.0 |
+| Spring Boot | 3.5.16 | Apache 2.0 |
+| Flowable OSS BPMN/DMN engines | 7.2.0 | Apache 2.0 |
+| PostgreSQL test server | 17.11 | PostgreSQL Licence |
+| Embedded PostgreSQL test launcher | 2.2.2 | Apache 2.0 |
+| Google OR-Tools Java/JNI | 9.15.6755 | Apache 2.0; retain bundled dependency notices |
 
-## Requirements
+Runtime libraries retain their own licence/notice metadata. Flowable commercial products and design tools are not dependencies. PostgreSQL JDBC is managed by the pinned Spring Boot dependency BOM; its licence is BSD 2-Clause. The test launcher runs an actual disposable PostgreSQL process, not H2.
 
-- Git
-- Python 3.10 or newer
+## Requirements and build
 
-The current checker uses only the Python standard library. No package installation, API key, model, database or cloud account is required.
+- JDK 21 on PATH, or `JAVA_HOME` pointing to a JDK 21 installation.
+- Network access on the first build to download Maven and dependencies/native test binaries.
+- Windows amd64 or Linux amd64 for the current proof target. Linux database tests must run as a non-root user.
+- Python 3.10+ only for the separate synthetic specification check.
 
-## Quick start
+No API key, model, paid service, Docker daemon or existing database is required for the local Java tests. The Maven wrapper distribution is checksum pinned; build tools and dependency caches should remain outside Git.
 
 ```powershell
 git clone https://github.com/DaivyaPatel/SIH_PS4.git
 cd SIH_PS4
+.\mvnw.cmd --batch-mode --no-transfer-progress verify
+```
+
+On Linux:
+
+```sh
+./mvnw --batch-mode --no-transfer-progress verify
+```
+
+Surefire reports are written under `stack-proof/target/surefire-reports/`. Generated build output and database state must not be committed. A missing native runtime prerequisite is a failed setup/test, not a skipped passing test.
+
+## What the Java tests check
+
+- A committed start persists one human task plus the case, audit event and outbox intent.
+- Failure after all start writes rolls back engine and application state together.
+- Failure after task completion restores the task, removes its uncommitted timer and rolls back the application intents.
+- Terminating the uncommitted PostgreSQL session leaves no committed orphan.
+- The DMN table maps three synthetic categories; unknown values do not receive a guessed route.
+- A timer remains in PostgreSQL after the engine closes; the restarted async worker creates one follow-up task.
+- The native solver respects precedence/non-overlap and distinguishes an impossible horizon from a feasible schedule.
+
+Audit/outbox tables here store transactional proof intents only. This does not implement a production audit security model, delivery worker, regulatory authorisation or full EVC optimisation.
+
+Verified locally on Windows amd64 with JDK 21: all eight Java tests pass with no skips. The build workflow separately checks Windows and the Linux amd64 container; local Windows success alone does not establish container compatibility.
+
+## Run the packaged native probe
+
+After a successful build:
+
+```powershell
+java -jar stack-proof/target/stack-proof-0.1.0-SNAPSHOT.jar --probe-native
+```
+
+The probe loads the JNI libraries from the OR-Tools platform jars and solves one feasible and one infeasible model without a database. The default non-web Spring application instead requires `PROOF_DATABASE_URL`, `PROOF_DATABASE_USER` and `PROOF_DATABASE_PASSWORD`. It creates proof tables and Flowable schemas automatically: use only a new disposable test database, never an existing institution or production database. No HTTP listener is exposed.
+
+## Linux container verification
+
+With Docker available:
+
+```sh
+docker build --platform linux/amd64 --tag aicte-stack-proof .
+docker run --rm --network none aicte-stack-proof
+```
+
+The build runs the Java suite, including real PostgreSQL, as a non-root user. The final JRE-only image runs the packaged native solver as a non-root user without network access. No image is published. Base images use version tags for this proof; pin approved digests before an actual pilot deployment.
+
+[GitHub Actions](./.github/workflows/stack-proof.yml) executes the Windows Java suite and the Linux container build/probe when relevant source or build files change. It uses read-only repository permissions and requires no deployment credentials.
+
+## Synthetic policy specification
+
+```powershell
 python scripts/check_synthetic_policy.py
 ```
 
-Expected output:
-
-```text
-PASS: three demo routes; 50 routing and 24 compliance fixtures
-All synthetic markers/activation guards pass. This is specification validation, not backend/timer/integration verification.
-```
-
-The process exits with a nonzero status if a validation fails. It performs no network calls, source-system writes, timer scheduling or message delivery.
+This separate offline checker validates three route examples and 74 expected routing/compliance cases. The Java stack proof does not yet implement the full fixture-backed regulatory domain. The future backend must pass those cases through its own guarded commands.
 
 ## Repository structure
 
 ```text
-config/
-  policies/
-    synthetic/
-      routes.json               # Route definitions and transition guards
-      routing-cases.json        # 50 routing acceptance cases
-      compliance-policy.json    # Synthetic calendar and compliance rules
-      compliance-cases.json     # 24 compliance acceptance cases
-scripts/
-  check_synthetic_policy.py      # Offline specification validator
-.editorconfig
-.gitattributes
-.gitignore
-README.md
+.mvn/wrapper/                 # Checksum-pinned Maven bootstrap configuration
+config/policies/synthetic/    # Synthetic rule definitions and expected cases
+scripts/                     # Offline specification checker
+stack-proof/
+  src/main/java/             # Engine configuration, transaction and native probes
+  src/main/resources/        # Synthetic BPMN/DMN, proof SQL, component metadata
+  src/test/java/             # PostgreSQL persistence and native solver checks
+pom.xml                      # Parent build and pinned component versions
+mvnw / mvnw.cmd              # Maven wrapper entry points
 ```
 
-## Working with the fixtures
-
-Route cases contain inputs and expected next-stage/role or blocked results. Compliance cases cover date calculations, submission timing, validity and notification responsibility. The checker also rejects invalid policy structure and unsafe activation flags.
-
-Keep synthetic markers and activation restrictions intact. Changes to a rule should include reviewed expected cases. When the backend is introduced, its tests must exercise these cases through actual domain commands; passing the offline checker alone does not prove runtime authorisation, durable recovery or regulatory correctness.
-
-Never commit credentials, private exports, institutional evidence or personal records. Use fabricated data and local test destinations for development.
-
-## Next implementation milestone
-
-Prove compatible Java/Spring Boot, Flowable, PostgreSQL and OR-Tools versions, including shared transaction rollback, a persisted timer and native solver execution. Runtime setup and start commands will be added as those components become executable.
+Keep credentials, private exports, institutional evidence and generated state out of Git. Use fabricated data and isolated test destinations during development. Application APIs, identity integration, document storage and UI modules follow this foundation proof.

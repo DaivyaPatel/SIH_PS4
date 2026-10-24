@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn" targetNamespace="urn:sih:synthetic:proof">
+  <process id="syntheticReview" name="Synthetic review persistence proof" isExecutable="true">
+    <startEvent id="start"/>
+    <sequenceFlow id="toReview" sourceRef="start" targetRef="review"/>
+    <userTask id="review" name="Synthetic evidence review" flowable:assignee="demo-reviewer"/>
+    <sequenceFlow id="toTimer" sourceRef="review" targetRef="reminder"/>
+    <intermediateCatchEvent id="reminder" name="Persisted synthetic reminder">
+      <timerEventDefinition><timeDuration>PT1S</timeDuration></timerEventDefinition>
+    </intermediateCatchEvent>
+    <sequenceFlow id="toFollowUp" sourceRef="reminder" targetRef="followUp"/>
+    <userTask id="followUp" name="Synthetic follow-up" flowable:assignee="demo-coordinator"/>
+    <sequenceFlow id="toEnd" sourceRef="followUp" targetRef="end"/>
+    <endEvent id="end"/>
+  </process>
+</definitions>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/"
+             id="syntheticRoutes" name="Synthetic route selection" namespace="urn:sih:synthetic:proof">
+  <decision id="syntheticRoute" name="Synthetic route">
+    <decisionTable id="routeTable" hitPolicy="UNIQUE">
+      <input id="categoryInput" label="Synthetic category">
+        <inputExpression id="categoryExpression" typeRef="string"><text>category</text></inputExpression>
+      </input>
+      <output id="routeOutput" name="route" typeRef="string"/>
+      <rule id="scrutinyOnly"><inputEntry id="inA"><text>"DEMO-CATEGORY-A"</text></inputEntry><outputEntry id="outA"><text>"DEMO-SCRUTINY"</text></outputEntry></rule>
+      <rule id="scrutinyEvc"><inputEntry id="inB"><text>"DEMO-CATEGORY-B"</text></inputEntry><outputEntry id="outB"><text>"DEMO-SCRUTINY-EVC"</text></outputEntry></rule>
+      <rule id="evcOnly"><inputEntry id="inC"><text>"DEMO-CATEGORY-C"</text></inputEntry><outputEntry id="outC"><text>"DEMO-EVC"</text></outputEntry></rule>
+    </decisionTable>
+  </decision>
+</definitions>
