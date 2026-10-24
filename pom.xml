@@ -25,6 +25,7 @@
   </properties>
   <modules>
     <module>stack-proof</module>
+    <module>backend</module>
   </modules>
   <dependencyManagement>
     <dependencies>

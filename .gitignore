@@ -25,6 +25,9 @@ hs_err_pid*.log
 replay_pid*.log
 *.hprof
 *.jfr
+*.tsbuildinfo
+/frontend/playwright-report/
+/frontend/test-results/
 
 # Local runtime data and evidence (never commit institutional records)
 .local/

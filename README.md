@@ -4,9 +4,46 @@ An integration-first project for approval-workflow coordination, EVC scheduling,
 
 ## Current implementation
 
-The Java stack-proof module exercises Spring-managed Flowable BPMN/DMN engines on a shared PostgreSQL datasource and transaction manager. It includes a synthetic human review task, a persisted timer, case/audit/outbox writes and native OR-Tools scheduling probes.
+The backend service and React/TypeScript shell provide public platform metadata and a local development foundation. A shared OpenAPI definition generates the UI response types. Application commands remain denied until scoped identity and authorisation are implemented.
 
-This is a compatibility proof, not an approval portal or production workflow backend. There are no public application endpoints, real institution records, external notifications or autonomous statutory decisions. All bundled workflows, users and dates are synthetic.
+The separate Java stack-proof module exercises Spring-managed Flowable BPMN/DMN engines on a shared PostgreSQL datasource and transaction manager. It includes a synthetic human review task, a persisted timer, case/audit/outbox writes and native OR-Tools scheduling probes. All bundled workflows, identities and dates are synthetic. Regulatory verification and decisions remain with authorised officials.
+
+## Local service and UI
+
+Requirements: Docker Engine/Desktop with Compose v2, Python 3.10+, Node 22.13+ (22.x) or 24+, and JDK 21 for native Java development. Container and UI dependencies are version pinned. No external API keys, AI model, paid service or cloud account is required.
+
+```powershell
+python scripts/init_dev.py
+docker compose up --build -d
+cd frontend
+npm ci --ignore-scripts
+npm run dev
+```
+
+Open http://localhost:5173. The UI proxies API requests to the backend at http://127.0.0.1:8080. Platform metadata is at `/api/v1/platform`; readiness is at `/actuator/health/readiness`. A database failure makes readiness fail. The initial Flyway migration creates platform metadata only and refuses automatic baselining or database cleaning.
+
+The generator refuses to overwrite an existing `.env` or private storage configuration and never prints credentials. Keep both local. Do not substitute the committed example placeholders for generated credentials. Unix permissions restrict the generated files; on Windows they inherit the workspace ACL.
+
+| Local service | Address | Purpose |
+|---|---|---|
+| PostgreSQL 17.11 | `127.0.0.1:5432` | Disposable development database |
+| SeaweedFS 4.49 | `127.0.0.1:8333` | Authenticated S3 development store; no anonymous identity |
+| Keycloak 26.8.1 | `http://localhost:8081` | Test IdP; realm `aicte-synthetic`, public PKCE client `approval-ui` |
+| Mailpit 1.32.0 | `http://localhost:8025`, SMTP `127.0.0.1:1025` | Local mail capture; no external delivery configured |
+
+Only loopback ports are published. Storage management ports are internal. Keycloak uses `start-dev` with persistent local state; log into its admin console as `local-admin` using the locally generated password. No institution users are seeded. The identity, storage and mail services are development dependencies, not implemented application integrations. Do not expose this stack publicly or use institutional evidence in it.
+
+`docker compose stop` preserves the named development volumes. `docker compose up -d` restarts them. Use `docker compose logs backend` to diagnose startup; keep logs local. Deleting volumes discards development data and is not part of routine startup.
+
+```powershell
+cd frontend
+npm run api:generate
+npm run build
+npm run lint
+npm test
+```
+
+API types are generated from [the OpenAPI contract](./api/openapi.json). Commit regenerated types with contract changes. UI build output and dependencies remain ignored. Build the backend with the Maven commands below; the proof module retains its own disposable database tests.
 
 ## Stack
 
@@ -94,6 +131,10 @@ This separate offline checker validates three route examples and 74 expected rou
 
 ```text
 .mvn/wrapper/                 # Checksum-pinned Maven bootstrap configuration
+api/                         # Shared API contract
+backend/                     # Modular Spring Boot service and Flyway migrations
+frontend/                    # React/TypeScript shell and generated API types
+compose.yaml                 # Loopback-only local development services
 config/policies/synthetic/    # Synthetic rule definitions and expected cases
 scripts/                     # Offline specification checker
 stack-proof/
@@ -104,4 +145,4 @@ pom.xml                      # Parent build and pinned component versions
 mvnw / mvnw.cmd              # Maven wrapper entry points
 ```
 
-Keep credentials, private exports, institutional evidence and generated state out of Git. Use fabricated data and isolated test destinations during development. Application APIs, identity integration, document storage and UI modules follow this foundation proof.
+Keep credentials, private exports, institutional evidence and generated state out of Git. Use fabricated data and isolated test destinations during development.

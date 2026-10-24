@@ -1,0 +1,52 @@
+name: aicte-development
+services:
+  postgres:
+    image: postgres:17.11-bookworm
+    environment:
+      POSTGRES_DB: approval
+      POSTGRES_USER: approval_dev
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run python scripts/init_dev.py first}
+    ports: ["127.0.0.1:5432:5432"]
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U approval_dev -d approval"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+  storage:
+    image: chrislusf/seaweedfs:4.49
+    command: ["server", "-dir=/data", "-s3", "-s3.config=/etc/seaweedfs/s3.json", "-ip=storage", "-volume.max=5"]
+    ports: ["127.0.0.1:8333:8333"]
+    volumes:
+      - storage-data:/data
+      - ./.local/dev/s3.json:/etc/seaweedfs/s3.json:ro
+  identity:
+    image: quay.io/keycloak/keycloak:26.8.1
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: local-admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?Run python scripts/init_dev.py first}
+      KC_HEALTH_ENABLED: "true"
+    ports: ["127.0.0.1:8081:8080"]
+    volumes:
+      - identity-data:/opt/keycloak/data
+      - ./config/dev/realm.json:/opt/keycloak/data/import/realm.json:ro
+  mail:
+    image: axllent/mailpit:v1.32.0
+    ports: ["127.0.0.1:8025:8025", "127.0.0.1:1025:1025"]
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      DATABASE_URL: jdbc:postgresql://postgres:5432/approval
+      DATABASE_USER: approval_dev
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:?Run python scripts/init_dev.py first}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports: ["127.0.0.1:8080:8080"]
+volumes:
+  postgres-data:
+  storage-data:
+  identity-data:

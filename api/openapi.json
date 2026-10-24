@@ -1,0 +1,30 @@
+{
+  "openapi": "3.0.3",
+  "info": {"title": "Approval Coordination API", "version": "0.1.0"},
+  "servers": [{"url": "/"}],
+  "paths": {
+    "/api/v1/platform": {
+      "get": {
+        "operationId": "getPlatformStatus",
+        "responses": {"200": {"description": "Public service capabilities; no institution data", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PlatformStatus"}}}}}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PlatformStatus": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "environment", "synthetic", "identityIntegrated", "hostConnected", "notificationsEnabled"],
+        "properties": {
+          "name": {"type": "string"},
+          "environment": {"type": "string"},
+          "synthetic": {"type": "boolean"},
+          "identityIntegrated": {"type": "boolean"},
+          "hostConnected": {"type": "boolean"},
+          "notificationsEnabled": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}
