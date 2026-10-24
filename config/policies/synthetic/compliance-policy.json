@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+  "policyVersion": "demo-2026-v1",
+  "academicYear": "DEMO-2026",
+  "ownerApproved": false,
+  "productionActivationAllowed": false,
+  "runtimeActivationAllowed": false,
+  "calendar": {
+    "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+    "id": "DEMO-CALENDAR",
+    "timeZone": "Asia/Kolkata",
+    "utcOffsetMinutes": 330,
+    "workingWeekdays": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "holidays": [
+      "2026-10-26"
+    ],
+    "holidayNote": "Invented demo non-working day; not an Indian official holiday assertion",
+    "excludeAnchorDate": true,
+    "dateOnlyDueInclusive": true,
+    "overdueBoundary": "start-of-next-local-date",
+    "pauseDefault": "not-permitted"
+  },
+  "obligationRule": {
+    "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+    "id": "DEMO-OBLIGATION",
+    "sourceOrder": "SYNTHETIC-ORDER",
+    "conditionGranularity": "one-obligation-per-condition",
+    "dueBasis": "confirmed-order-date-or-approved-demo-offset",
+    "evidence": [
+      "DEMO-EVIDENCE-CHECKLIST"
+    ],
+    "reviewRole": "assigned_verifier",
+    "uploadImpliesAcceptance": false,
+    "extensionRequiresAuthorityAndReason": true,
+    "preserveOriginalDue": true
+  },
+  "documentRule": {
+    "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+    "id": "DEMO-VALIDITY",
+    "acceptedVersionOnly": true,
+    "expiryDateInclusive": true,
+    "remainingValidityComparison": "expiry-at-or-after-explicit-demo-horizon",
+    "ambiguousDates": "UNKNOWN_REQUIRES_REVIEW",
+    "noExpiryRequiresExplicitApplicability": true,
+    "renewalUploadImpliesAcceptance": false
+  },
+  "notificationRule": {
+    "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+    "id": "DEMO-NOTICES",
+    "offsetDays": [
+      -7,
+      -3,
+      -1
+    ],
+    "offsetBasis": "calendar-days",
+    "repeatLimit": 2,
+    "testSinkOnly": true,
+    "escalationAfterOverdueDays": [
+      1,
+      3
+    ],
+    "pendingActionRecipients": {
+      "noSubmission": "institution",
+      "reviewPending": "assigned_verifier",
+      "evcSchedulePending": "evc_coordinator",
+      "evcReportPending": "evc_reporter",
+      "sourceStale": "integration_support",
+      "deliveryFailure": "operations"
+    },
+    "higherAuthorityRole": "regional_officer",
+    "dispatchRecheckRequired": true,
+    "staleSourceBlocksAccusatoryNotice": true
+  },
+  "obligationExamples": [
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-OBLIGATION-A",
+      "sourceOrder": "SYNTHETIC-ORDER",
+      "sourcePassage": "Synthetic condition A: provide the sample equipment inventory by the confirmed date.",
+      "dueDate": "2026-11-03",
+      "requiredEvidence": [
+        "DEMO-EQUIPMENT-INVENTORY"
+      ],
+      "institution": "DEMO-INSTITUTION",
+      "reviewRole": "assigned_verifier",
+      "status": "OPEN"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-OBLIGATION-B",
+      "sourceOrder": "SYNTHETIC-ORDER",
+      "sourcePassage": "Synthetic condition B: provide the sample safety evidence by the confirmed date.",
+      "dueDate": "2026-11-10",
+      "requiredEvidence": [
+        "DEMO-SAFETY-EVIDENCE"
+      ],
+      "institution": "DEMO-INSTITUTION",
+      "reviewRole": "assigned_verifier",
+      "status": "OPEN"
+    }
+  ],
+  "extensionExample": {
+    "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+    "id": "DEMO-EXTENSION",
+    "obligationId": "DEMO-OBLIGATION-A",
+    "originalDueDate": "2026-11-03",
+    "currentDueDate": "2026-11-06",
+    "reason": "Synthetic authorised extension for demonstration",
+    "authorityReference": "DEMO-AUTHORITY",
+    "preserveOriginalDue": true,
+    "invalidatesUnsentOldGeneration": true
+  }
+}

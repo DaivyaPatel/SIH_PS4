@@ -1,0 +1,656 @@
+{
+  "schemaVersion": 1,
+  "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+  "policyVersion": "demo-2026-v1",
+  "academicYear": "DEMO-2026",
+  "ownerApproved": false,
+  "productionActivationAllowed": false,
+  "runtimeActivationAllowed": false,
+  "actorRoles": [
+    "institution",
+    "scrutiny_reviewer",
+    "rescrutiny_reviewer",
+    "evc_coordinator",
+    "evc_reporter",
+    "hearing_authority",
+    "appeal_committee",
+    "competent_authority",
+    "assigned_verifier",
+    "regional_officer",
+    "integration_support",
+    "operations"
+  ],
+  "unknownCategoryBehaviour": "POLICY_CLARIFICATION",
+  "noMatchingTransition": "TRANSITION_NOT_ALLOWED",
+  "routes": [
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY",
+      "category": "DEMO-CATEGORY-A",
+      "initialStage": "SCRUTINY",
+      "initialRole": "scrutiny_reviewer",
+      "evidenceVersionReviewRequired": true,
+      "reReviewCreatesNewIteration": true,
+      "closeProcessingKeepsObligations": true,
+      "transitions": [
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-01",
+          "event": "RECORD_PROCEED",
+          "fromStage": "SCRUTINY",
+          "actorRole": "scrutiny_reviewer",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "reportAccepted",
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-02",
+          "event": "RAISE_DEFICIENCY",
+          "fromStage": "SCRUTINY",
+          "actorRole": "scrutiny_reviewer",
+          "toStage": "DEFICIENCY_RESPONSE",
+          "nextRole": "institution",
+          "requiredTrue": [
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-03",
+          "event": "RECORD_NOT_RECOMMENDED",
+          "fromStage": "SCRUTINY",
+          "actorRole": "scrutiny_reviewer",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "reportAccepted",
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-04",
+          "event": "REQUEST_HEARING",
+          "fromStage": "SCRUTINY",
+          "actorRole": "hearing_authority",
+          "toStage": "SHC",
+          "nextRole": "hearing_authority",
+          "requiredTrue": [
+            "hearingApplicable",
+            "hearingAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-05",
+          "event": "RECORD_PROCEED",
+          "fromStage": "RESCRUTINY",
+          "actorRole": "rescrutiny_reviewer",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "reportAccepted",
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-06",
+          "event": "RAISE_DEFICIENCY",
+          "fromStage": "RESCRUTINY",
+          "actorRole": "rescrutiny_reviewer",
+          "toStage": "DEFICIENCY_RESPONSE",
+          "nextRole": "institution",
+          "requiredTrue": [
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-07",
+          "event": "RECORD_NOT_RECOMMENDED",
+          "fromStage": "RESCRUTINY",
+          "actorRole": "rescrutiny_reviewer",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "reportAccepted",
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-08",
+          "event": "REQUEST_HEARING",
+          "fromStage": "RESCRUTINY",
+          "actorRole": "hearing_authority",
+          "toStage": "SHC",
+          "nextRole": "hearing_authority",
+          "requiredTrue": [
+            "hearingApplicable",
+            "hearingAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-09",
+          "event": "SUBMIT_PARTIAL_RESPONSE",
+          "fromStage": "DEFICIENCY_RESPONSE",
+          "actorRole": "institution",
+          "toStage": "DEFICIENCY_RESPONSE",
+          "nextRole": "institution",
+          "requiredTrue": [
+            "scopedSubmissionConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-10",
+          "event": "SUBMIT_RESPONSE",
+          "fromStage": "DEFICIENCY_RESPONSE",
+          "actorRole": "institution",
+          "toStage": "RESCRUTINY",
+          "nextRole": "rescrutiny_reviewer",
+          "requiredTrue": [
+            "scopedSubmissionConfirmed",
+            "responseComplete"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-11",
+          "event": "RECORD_HEARING_RECOMMENDATION",
+          "fromStage": "SHC",
+          "actorRole": "hearing_authority",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "reportAccepted",
+            "hearingAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-12",
+          "event": "RECORD_SOURCE_DECISION",
+          "fromStage": "DECISION_PENDING",
+          "actorRole": "competent_authority",
+          "toStage": "DECISION_RECORDED",
+          "nextRole": null,
+          "requiredTrue": [
+            "sourceDecisionConfirmed",
+            "decisionAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-13",
+          "event": "REQUEST_APPEAL",
+          "fromStage": "DECISION_RECORDED",
+          "actorRole": "institution",
+          "toStage": "SAC",
+          "nextRole": "appeal_committee",
+          "requiredTrue": [
+            "appealApplicable",
+            "appealUnused",
+            "appealWindowConfirmed",
+            "sourceDecisionConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-14",
+          "event": "RECORD_APPEAL_RECOMMENDATION",
+          "fromStage": "SAC",
+          "actorRole": "appeal_committee",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "reportAccepted",
+            "appealAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EDGE-15",
+          "event": "CLOSE_PROCESSING",
+          "fromStage": "DECISION_RECORDED",
+          "actorRole": "competent_authority",
+          "toStage": "PROCESSING_CLOSED",
+          "nextRole": null,
+          "requiredTrue": [
+            "sourceDecisionConfirmed",
+            "closureAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        }
+      ]
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC",
+      "category": "DEMO-CATEGORY-B",
+      "initialStage": "SCRUTINY",
+      "initialRole": "scrutiny_reviewer",
+      "evidenceVersionReviewRequired": true,
+      "reReviewCreatesNewIteration": true,
+      "closeProcessingKeepsObligations": true,
+      "transitions": [
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-01",
+          "event": "RECORD_PROCEED",
+          "fromStage": "SCRUTINY",
+          "actorRole": "scrutiny_reviewer",
+          "toStage": "EVC",
+          "nextRole": "evc_coordinator",
+          "requiredTrue": [
+            "reportAccepted",
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-02",
+          "event": "RAISE_DEFICIENCY",
+          "fromStage": "SCRUTINY",
+          "actorRole": "scrutiny_reviewer",
+          "toStage": "DEFICIENCY_RESPONSE",
+          "nextRole": "institution",
+          "requiredTrue": [
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-03",
+          "event": "RECORD_NOT_RECOMMENDED",
+          "fromStage": "SCRUTINY",
+          "actorRole": "scrutiny_reviewer",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "reportAccepted",
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-04",
+          "event": "REQUEST_HEARING",
+          "fromStage": "SCRUTINY",
+          "actorRole": "hearing_authority",
+          "toStage": "SHC",
+          "nextRole": "hearing_authority",
+          "requiredTrue": [
+            "hearingApplicable",
+            "hearingAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-05",
+          "event": "RECORD_PROCEED",
+          "fromStage": "RESCRUTINY",
+          "actorRole": "rescrutiny_reviewer",
+          "toStage": "EVC",
+          "nextRole": "evc_coordinator",
+          "requiredTrue": [
+            "reportAccepted",
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-06",
+          "event": "RAISE_DEFICIENCY",
+          "fromStage": "RESCRUTINY",
+          "actorRole": "rescrutiny_reviewer",
+          "toStage": "DEFICIENCY_RESPONSE",
+          "nextRole": "institution",
+          "requiredTrue": [
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-07",
+          "event": "RECORD_NOT_RECOMMENDED",
+          "fromStage": "RESCRUTINY",
+          "actorRole": "rescrutiny_reviewer",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "reportAccepted",
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-08",
+          "event": "REQUEST_HEARING",
+          "fromStage": "RESCRUTINY",
+          "actorRole": "hearing_authority",
+          "toStage": "SHC",
+          "nextRole": "hearing_authority",
+          "requiredTrue": [
+            "hearingApplicable",
+            "hearingAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-09",
+          "event": "SUBMIT_PARTIAL_RESPONSE",
+          "fromStage": "DEFICIENCY_RESPONSE",
+          "actorRole": "institution",
+          "toStage": "DEFICIENCY_RESPONSE",
+          "nextRole": "institution",
+          "requiredTrue": [
+            "scopedSubmissionConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-10",
+          "event": "SUBMIT_RESPONSE",
+          "fromStage": "DEFICIENCY_RESPONSE",
+          "actorRole": "institution",
+          "toStage": "RESCRUTINY",
+          "nextRole": "rescrutiny_reviewer",
+          "requiredTrue": [
+            "scopedSubmissionConfirmed",
+            "responseComplete"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-11",
+          "event": "RECORD_PROCEED",
+          "fromStage": "EVC",
+          "actorRole": "evc_reporter",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "preliminaryProcessingComplete",
+            "visitConducted",
+            "reportAccepted",
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-12",
+          "event": "RECORD_NOT_RECOMMENDED",
+          "fromStage": "EVC",
+          "actorRole": "evc_reporter",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "visitConducted",
+            "reportAccepted",
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-13",
+          "event": "REQUEST_HEARING",
+          "fromStage": "EVC",
+          "actorRole": "hearing_authority",
+          "toStage": "SHC",
+          "nextRole": "hearing_authority",
+          "requiredTrue": [
+            "hearingApplicable",
+            "hearingAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-14",
+          "event": "AUTHORISED_RETURN",
+          "fromStage": "EVC",
+          "actorRole": "competent_authority",
+          "toStage": "SCRUTINY",
+          "nextRole": "scrutiny_reviewer",
+          "requiredTrue": [
+            "returnAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-15",
+          "event": "RECORD_HEARING_RECOMMENDATION",
+          "fromStage": "SHC",
+          "actorRole": "hearing_authority",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "reportAccepted",
+            "hearingAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-16",
+          "event": "RECORD_SOURCE_DECISION",
+          "fromStage": "DECISION_PENDING",
+          "actorRole": "competent_authority",
+          "toStage": "DECISION_RECORDED",
+          "nextRole": null,
+          "requiredTrue": [
+            "sourceDecisionConfirmed",
+            "decisionAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-17",
+          "event": "REQUEST_APPEAL",
+          "fromStage": "DECISION_RECORDED",
+          "actorRole": "institution",
+          "toStage": "SAC",
+          "nextRole": "appeal_committee",
+          "requiredTrue": [
+            "appealApplicable",
+            "appealUnused",
+            "appealWindowConfirmed",
+            "sourceDecisionConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-18",
+          "event": "RECORD_APPEAL_RECOMMENDATION",
+          "fromStage": "SAC",
+          "actorRole": "appeal_committee",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "reportAccepted",
+            "appealAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-SCRUTINY-EVC-EDGE-19",
+          "event": "CLOSE_PROCESSING",
+          "fromStage": "DECISION_RECORDED",
+          "actorRole": "competent_authority",
+          "toStage": "PROCESSING_CLOSED",
+          "nextRole": null,
+          "requiredTrue": [
+            "sourceDecisionConfirmed",
+            "closureAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        }
+      ]
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-EVC",
+      "category": "DEMO-CATEGORY-C",
+      "initialStage": "EVC",
+      "initialRole": "evc_coordinator",
+      "evidenceVersionReviewRequired": true,
+      "reReviewCreatesNewIteration": true,
+      "closeProcessingKeepsObligations": true,
+      "transitions": [
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-EVC-EDGE-01",
+          "event": "RECORD_PROCEED",
+          "fromStage": "EVC",
+          "actorRole": "evc_reporter",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "preliminaryProcessingComplete",
+            "visitConducted",
+            "reportAccepted",
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-EVC-EDGE-02",
+          "event": "RECORD_NOT_RECOMMENDED",
+          "fromStage": "EVC",
+          "actorRole": "evc_reporter",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "visitConducted",
+            "reportAccepted",
+            "reviewAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-EVC-EDGE-03",
+          "event": "REQUEST_HEARING",
+          "fromStage": "EVC",
+          "actorRole": "hearing_authority",
+          "toStage": "SHC",
+          "nextRole": "hearing_authority",
+          "requiredTrue": [
+            "hearingApplicable",
+            "hearingAuthorityConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-EVC-EDGE-04",
+          "event": "RECORD_HEARING_RECOMMENDATION",
+          "fromStage": "SHC",
+          "actorRole": "hearing_authority",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "reportAccepted",
+            "hearingAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-EVC-EDGE-05",
+          "event": "RECORD_SOURCE_DECISION",
+          "fromStage": "DECISION_PENDING",
+          "actorRole": "competent_authority",
+          "toStage": "DECISION_RECORDED",
+          "nextRole": null,
+          "requiredTrue": [
+            "sourceDecisionConfirmed",
+            "decisionAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-EVC-EDGE-06",
+          "event": "REQUEST_APPEAL",
+          "fromStage": "DECISION_RECORDED",
+          "actorRole": "institution",
+          "toStage": "SAC",
+          "nextRole": "appeal_committee",
+          "requiredTrue": [
+            "appealApplicable",
+            "appealUnused",
+            "appealWindowConfirmed",
+            "sourceDecisionConfirmed"
+          ],
+          "reasonRequired": true
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-EVC-EDGE-07",
+          "event": "RECORD_APPEAL_RECOMMENDATION",
+          "fromStage": "SAC",
+          "actorRole": "appeal_committee",
+          "toStage": "DECISION_PENDING",
+          "nextRole": "competent_authority",
+          "requiredTrue": [
+            "reportAccepted",
+            "appealAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        },
+        {
+          "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+          "id": "DEMO-EVC-EDGE-08",
+          "event": "CLOSE_PROCESSING",
+          "fromStage": "DECISION_RECORDED",
+          "actorRole": "competent_authority",
+          "toStage": "PROCESSING_CLOSED",
+          "nextRole": null,
+          "requiredTrue": [
+            "sourceDecisionConfirmed",
+            "closureAuthorityConfirmed"
+          ],
+          "reasonRequired": false
+        }
+      ]
+    }
+  ]
+}
