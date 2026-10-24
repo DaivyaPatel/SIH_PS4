@@ -26,8 +26,21 @@ runtime-data/
 uploads/
 backups/
 
+# Supporting documents and research stay local; publish code/test assets only.
+/files/
+/docs/
+*.md
+*.docx
+*.pdf
+/README*
+/CONTRIBUTING*
+/config/discovery/
+/config/evaluation/
+/config/regulatory/
+/scripts/check_source_register.py
+
 # Regulatory research downloads/extractions and local review artefacts
-# Commit source metadata, checksums and synthetic fixtures instead of bundles.
+# Executable synthetic test fixtures remain tracked.
 /research-downloads/
 /regulatory-cache/
 /review-exports/
