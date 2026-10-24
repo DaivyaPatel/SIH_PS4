@@ -1,6 +1,6 @@
 # Delivery backlog: AICTE approval orchestration and compliance
 
-Version: 1.0 | Updated: 25 October 2026 | Status: repository setup and first two discovery tickets complete for prototype scope; application runtime not started
+Version: 1.0 | Updated: 25 October 2026 | Status: E00/G0 complete for synthetic prototype discovery; application runtime not started; real approvals pending
 
 Product authority: [MASTER_PRD.md](./MASTER_PRD.md). Source context: [research folder](./). Requirement IDs, acceptance scenarios AT-01–AT-20 and gates G0–G4 refer to the PRD. Checkboxes and linked evidence track progress; unchecked work remains TODO. No ticket is completed merely because this backlog exists.
 
@@ -62,11 +62,13 @@ Suggested parallel workstreams after M1: workflow/clocks; evidence/compliance; E
 
 ## E00 — Discovery and approved baseline
 
+**Status: DONE for synthetic prototype discovery (G0).** Host/authority contract, synthetic source/rule baseline, MVP journeys/flows and proposed measurement contract are documented. Real host/regulatory/data/hosting approvals, team capacity and demo date remain open decisions; no application runtime or G1/G2 completion is claimed.
+
 ### T001 — Identify host, authority and integration mode
 
 **P0 · M · Owner: product + INT · Depends: none · Maps: INT-01; D01–D02; G0**
 
-**Status: DONE for prototype discovery.** Evidence: [discovery decision register](../docs/discovery/decision-register.md). Daivya Patel is the provisional project coordination owner; actual host/regulatory/pilot approvals remain pending. E00/G0 are not yet complete.
+**Status: DONE for prototype discovery.** Evidence: [discovery decision register](../docs/discovery/decision-register.md). Daivya Patel is the provisional project coordination owner; actual host/regulatory/pilot approvals remain pending. Overall E00/G0 progress is recorded at the epic heading.
 
 - [x] T001.1 Inventory the repository/host when supplied: architecture, auth, entities, status model, API/event/export/embedding capabilities and ownership. Evidence: [repository and host inventory](../docs/discovery/host-inventory.md). No executable host has been supplied; real-host discovery reopens when one is provided.
 - [x] T001.2 Create field/entity ownership matrix and delegated-action allowlist, including official facts/decisions versus service-owned tasks/timers. Evidence: [source-of-truth and delegated-action contract](../docs/discovery/ownership-and-authority.md); live entitlements remain ungranted.
@@ -79,7 +81,7 @@ Suggested parallel workstreams after M1: workflow/clocks; evidence/compliance; E
 
 **P0 · M · Owner: process analyst + product · Depends: none · Maps: POL-01, WF-01, CLK-01; D03–D08**
 
-**Status: DONE for prototype research and synthetic specification.** Real regulatory approval/current corpus completeness remain blocked; this does not complete E00/G0. Evidence: source register, synthetic fixtures/offline checks and the unapproved owner-review checklist linked below.
+**Status: DONE for prototype research and synthetic specification.** Real regulatory approval/current corpus completeness remain blocked. Overall E00/G0 progress is recorded at the epic heading. Evidence: source register, synthetic fixtures/offline checks and the unapproved owner-review checklist linked below.
 
 - [x] T002.1 Catalogue APH, amendments, annual notices/orders and older-source limitations with document checksum, clause/page, applicability and supersession evidence. Evidence: [source catalogue](../docs/regulatory/source-register.md), [canonical metadata](../config/regulatory/source-register.json) and offline checksum verification; current corpus completeness is not claimed.
 - [x] T002.2 Obtain authoritative replacement for the failed updated-addendum URL where possible; unresolved text remains an explicit activation blocker. Evidence: [retrieved government-hosted amendment copy and exact-version gaps](../docs/regulatory/amendment-review.md). Candidate copy retrieved; equivalence/latest applicability and owner approval remain blocked.
@@ -93,9 +95,11 @@ Suggested parallel workstreams after M1: workflow/clocks; evidence/compliance; E
 
 **P0 · S · Owner: product + UX + QA · Depends: T001, T002 · Maps: UX-01, PLN-04; G0**
 
-- [ ] T003.1 Confirm P0/P1/P2 scope, representative personas and five core journeys: routing, deficiency, EVC/planning, undertaking and renewal/escalation.
-- [ ] T003.2 Produce low-fidelity contextual workspace/console flows including stale, blocked, unknown-write and unverified-evidence states.
-- [ ] T003.3 Agree proposed benchmark sizes, synthetic-data manifest, demo evidence and pilot user-task timing protocol.
+**Status: DONE as the working prototype delivery baseline under the PRD.** Capacity/date and real-pilot approvals remain unassigned; proposed numerical targets are not measured outcomes.
+
+- [x] T003.1 Confirm P0/P1/P2 scope, representative personas and five core journeys: routing, deficiency, EVC/planning, undertaking and renewal/escalation. Evidence: [MVP scope, personas, journeys and PS traceability](../docs/product/mvp-scope.md).
+- [x] T003.2 Produce low-fidelity contextual workspace/console flows including stale, blocked, unknown-write and unverified-evidence states. Evidence: [text wireframes, navigation and recovery flows](../docs/product/ux-flows.md); no implemented UI claimed.
+- [x] T003.3 Agree proposed benchmark sizes, synthetic-data manifest, demo evidence and pilot user-task timing protocol. Evidence: [working measurement plan](../docs/evaluation/measurement-plan.md) and [planned benchmark manifest](../config/evaluation/benchmark-manifest.json). Uses PRD proposed targets; generators/runtime tests/study remain unimplemented or not run, with capacity/date unassigned.
 
 **Acceptance:** journeys trace to PS A–F and PRD IDs; MVP includes every PS area and the planner. Stakeholders can distinguish reference-host proof from live AICTE integration.
 

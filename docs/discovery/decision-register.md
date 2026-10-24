@@ -34,7 +34,7 @@ The coordinator is responsible for chasing each input, not approving the underly
 | Scope | Evidence/current permission | Consequence |
 |---|---|---|
 | Work in this repository | User requested setup and first-ticket work in this session | Repository documentation/discovery and the scoped next deliverables are authorised |
-| Branch, commit, push and merge into `main` | User explicitly requested a new branch/push/merge for each completed subticket | Use ordinary Git and descriptive messages without ticket names; retain branches; no force-push/protection bypass |
+| Branch, commit, push and merge into `main` | User initially requested per-subticket branches, then updated the preference to commits grouping two or three subtickets | Use ordinary Git, descriptive messages without ticket names, README/ignore updates and current backlog evidence; retain branches; no force-push/protection bypass |
 | Synthetic reference-host prototype | PRD fallback plus absent supplied host; selected as reversible prototype design | Design/build only within synthetic scope; runtime activation still requires implemented controls |
 | Read/change a government or institutional system | No entitlement supplied | Disabled; no portal probing, scraping, credentials or inferred private APIs |
 | Real personal/institution evidence | No processing/records approval supplied | Do not ingest, upload, expose or include in fixtures |
@@ -44,7 +44,9 @@ The coordinator is responsible for chasing each input, not approving the underly
 
 ## Outstanding questions and safe progress
 
-The coordinator should supply an actual host if one exists, confirm the coordinator/team roster, identify a process reviewer, set team capacity/demo date/budget and name the pilot sponsor. Real owners can remain pending while synthetic routing fixtures and the technology compatibility proof proceed. Do not describe this register as G0 completion: regulatory baseline/fixtures and scope/measurement work in the remaining discovery tickets are still open.
+The coordinator should supply an actual host if one exists, confirm the coordinator/team roster, identify a process reviewer, set team capacity/demo date/budget and name the pilot sponsor. Real owners can remain pending while the technology compatibility proof and synthetic implementation proceed.
+
+Since this register was first written, the [regulatory baseline](../regulatory/source-register.md), [synthetic fixtures](../regulatory/synthetic-policy-guide.md), [MVP scope/flows](../product/mvp-scope.md) and [measurement plan](../evaluation/measurement-plan.md) have been prepared. G0 is now complete for synthetic prototype discovery. This records progress, not approval of a real regulatory corpus or host; G1/G2/G3 remain open. The current [benchmark manifest](../../config/evaluation/benchmark-manifest.json) retains null team capacity/date and explicitly not-run workload/study states.
 
 ## First-ticket completion evidence
 
@@ -55,4 +57,4 @@ The coordinator should supply an actual host if one exists, confirm the coordina
 | Initial mode and fallback | [Integration decision](./integration-mode.md), [design profiles](../../config/discovery/integration-profiles.json) | Concrete synthetic event/API reference path, read-only import and freshness contract |
 | Owners, gates and open questions | This register | Named provisional project coordination and required-by gates for D01–D12; real signatories explicitly unresolved |
 
-This closes the first ticket's prototype discovery scope, not the external approvals or the entire discovery epic. No runtime implementation or production AICTE integration is claimed.
+The table records the first ticket's completion evidence. The later discovery deliverables linked above now close E00 for prototype scope; external approvals remain open. No runtime implementation or production AICTE integration is claimed.

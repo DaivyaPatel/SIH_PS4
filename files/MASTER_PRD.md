@@ -4,6 +4,8 @@ Version: 1.0 | Date: 25 October 2026 | Status: implementation baseline; regulato
 
 Companion delivery backlog: [tickets.md](./tickets.md). This document specifies the product; the backlog specifies deliverable work and dependencies. Neither document constitutes AICTE authorisation or an approved interpretation of regulations.
 
+Prototype discovery elaboration: [MVP scope/journeys](../docs/product/mvp-scope.md), [low-fidelity flows](../docs/product/ux-flows.md) and [measurement plan](../docs/evaluation/measurement-plan.md). These preserve the proposed PRD targets and pending external approvals; they do not claim an implemented runtime or measured outcomes.
+
 ## 1. Product definition
 
 Build an integration-first orchestration and compliance service around an existing authorised application system. It coordinates permitted application routes, human review tasks, EVC scheduling, undertakings, document validity, reminders, escalations, reporting and audit. A contextual task interface sits inside the host where possible; a small console supports cross-case operations and administration. An optional browser side panel supports approved legacy environments.
