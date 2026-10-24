@@ -1,6 +1,6 @@
 # Delivery backlog: AICTE approval orchestration and compliance
 
-Version: 1.0 | Date: 25 October 2026 | Status: planned, no implementation claimed
+Version: 1.0 | Updated: 25 October 2026 | Status: repository setup and first discovery ticket complete; application implementation not started
 
 Product authority: [MASTER_PRD.md](./MASTER_PRD.md). Source context: [research folder](./). Requirement IDs, acceptance scenarios AT-01–AT-20 and gates G0–G4 refer to the PRD. Checkboxes and linked evidence track progress; unchecked work remains TODO. No ticket is completed merely because this backlog exists.
 
@@ -66,10 +66,12 @@ Suggested parallel workstreams after M1: workflow/clocks; evidence/compliance; E
 
 **P0 · M · Owner: product + INT · Depends: none · Maps: INT-01; D01–D02; G0**
 
+**Status: DONE for prototype discovery.** Evidence: [discovery decision register](../docs/discovery/decision-register.md). Daivya Patel is the provisional project coordination owner; actual host/regulatory/pilot approvals remain pending. E00/G0 are not yet complete.
+
 - [x] T001.1 Inventory the repository/host when supplied: architecture, auth, entities, status model, API/event/export/embedding capabilities and ownership. Evidence: [repository and host inventory](../docs/discovery/host-inventory.md). No executable host has been supplied; real-host discovery reopens when one is provided.
 - [x] T001.2 Create field/entity ownership matrix and delegated-action allowlist, including official facts/decisions versus service-owned tasks/timers. Evidence: [source-of-truth and delegated-action contract](../docs/discovery/ownership-and-authority.md); live entitlements remain ungranted.
 - [x] T001.3 Choose sanctioned host integration or labelled synthetic reference host; document capability flags, read-only fallback and freshness contract. Evidence: [initial integration decision](../docs/discovery/integration-mode.md) and [inactive design profiles](../config/discovery/integration-profiles.json); selected synthetic reference host, no runtime/live integration claimed.
-- [ ] T001.4 Assign named owners and required-by gates for D01–D12; record permissions and unanswered questions.
+- [x] T001.4 Assign named owners and required-by gates for D01–D12; record permissions and unanswered questions. Evidence: [named coordination, decision gates and permission register](../docs/discovery/decision-register.md). External approving authorities remain explicitly unassigned; their approvals gate real activation, not synthetic discovery.
 
 **Acceptance:** one concrete initial integration path is selected; unsupported actions are visibly disabled in the design. No public AICTE API or write entitlement is presumed. Lack of production access has an actionable reference-host fallback.
 
