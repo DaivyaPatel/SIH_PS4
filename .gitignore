@@ -37,6 +37,11 @@ backups/
 .pytest_cache/
 .ruff_cache/
 
+# Local benchmark runs and consented participant-study data
+# Publish reviewed, redacted summaries explicitly; never raw participant records.
+/evaluation-results/
+/participant-study/
+
 # Editor and OS state
 .idea/
 .vscode/

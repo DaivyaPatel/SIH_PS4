@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "purpose": "planned-synthetic-evaluation-contract",
+  "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+  "evaluationVersion": "demo-evaluation-v1",
+  "policyVersion": "demo-2026-v1",
+  "runtimeBenchmarksExecuted": false,
+  "pilotStudyExecuted": false,
+  "productionActivationAllowed": false,
+  "teamCapacity": null,
+  "demoDeadline": null,
+  "externalServicesRequiredForThisPlan": [],
+  "existingSpecificationEvidence": {
+    "routingCases": "config/policies/synthetic/routing-cases.json",
+    "complianceCases": "config/policies/synthetic/compliance-cases.json",
+    "expectedRoutingCaseCount": 50,
+    "expectedComplianceCaseCount": 24,
+    "evidenceClass": "offline-specification-only"
+  },
+  "plannedDemoDataset": {
+    "status": "planned-not-generated",
+    "generatorImplemented": false,
+    "seed": 26262,
+    "referenceTime": "2026-10-25T09:00:00+00:00",
+    "regionCount": 2,
+    "institutionCount": 4,
+    "applicationCount": 24,
+    "casesPerRoute": {
+      "DEMO-SCRUTINY": 8,
+      "DEMO-SCRUTINY-EVC": 8,
+      "DEMO-EVC": 8
+    },
+    "identifierPrefix": "DEMO-",
+    "emailDomain": "example.invalid",
+    "evidencePolicy": "fabricated files only; no real institution records or signatures",
+    "sourceProfile": "reference-host",
+    "notificationDestination": "local-test-mail-sink",
+    "runtimeRoleIdentities": "one or more scoped synthetic identities per journey role; not real appointments"
+  },
+  "journeys": [
+    {
+      "id": "J01",
+      "scope": "mapped routing and source acknowledgement",
+      "problemStatementAreas": ["A", "B", "F"],
+      "acceptanceScenarios": ["AT-01", "AT-03", "AT-04", "AT-05"],
+      "routingFixtureIds": ["DEMO-SCRUTINY-initial", "DEMO-SCRUTINY-proceed", "unknown-category", "wrong-role"],
+      "complianceFixtureIds": [],
+      "runtimeEvidenceRequired": ["event receipt", "guarded next task", "duplicate suppression", "unknown source write reconciliation", "correlated audit"]
+    },
+    {
+      "id": "J02",
+      "scope": "deficiency, partial response and re-review",
+      "problemStatementAreas": ["A", "B", "D", "F"],
+      "acceptanceScenarios": ["AT-02", "AT-04", "AT-13", "AT-15"],
+      "routingFixtureIds": ["DEMO-SCRUTINY-deficiency", "partial-response", "DEMO-SCRUTINY-response", "repeat-deficiency", "negative-review", "reason-required"],
+      "complianceFixtureIds": [],
+      "runtimeEvidenceRequired": ["two persisted review iterations", "exact evidence versions", "submission receipt", "scope and upload rejection"]
+    },
+    {
+      "id": "J03",
+      "scope": "EVC scheduling and readiness recovery planner",
+      "problemStatementAreas": ["B", "C", "F"],
+      "acceptanceScenarios": ["AT-05", "AT-10", "AT-11", "AT-19"],
+      "routingFixtureIds": ["evc-proceed", "evc-not-conducted", "evc-negative-review"],
+      "complianceFixtureIds": [],
+      "runtimeEvidenceRequired": ["shared resource conflict", "feasible alternative", "ineligible expert rejection", "stale proposal rejection", "source receipt", "baseline comparison"]
+    },
+    {
+      "id": "J04",
+      "scope": "two undertakings and version-specific review",
+      "problemStatementAreas": ["B", "D", "F"],
+      "acceptanceScenarios": ["AT-06", "AT-08", "AT-13"],
+      "routingFixtureIds": [],
+      "complianceFixtureIds": ["timely-awaiting-review", "late-awaiting-review", "missing-overdue"],
+      "runtimeEvidenceRequired": ["two distinct conditions", "review pending separate from submission", "extension original and current due", "evidence acceptance authority"]
+    },
+    {
+      "id": "J05",
+      "scope": "renewal, dispatch race and correct escalation",
+      "problemStatementAreas": ["B", "D", "E", "F"],
+      "acceptanceScenarios": ["AT-07", "AT-08", "AT-09", "AT-12", "AT-15"],
+      "routingFixtureIds": [],
+      "complianceFixtureIds": ["valid-insufficient", "expired-renewal-pending", "accepted-renewal", "submitted-at-dispatch", "source-outage", "delivery-failed"],
+      "runtimeEvidenceRequired": ["accepted document version retained", "renewal receipt and verification", "dispatch-time recheck", "mail and worker recovery", "pending-role escalation"]
+    }
+  ],
+  "serviceLoadPlan": {
+    "status": "not-run",
+    "applicationCount": 10000,
+    "taskCount": 100000,
+    "auditEventCount": 100000,
+    "concurrentSessions": 50,
+    "warmupMinutes": 2,
+    "measuredMinutes": 10,
+    "plannedReadMixPercent": {
+      "caseDetail": 60,
+      "scopedQueue": 25,
+      "dashboard": 15
+    },
+    "caseReadP95TargetMsExclusive": 2000,
+    "dashboardP95TargetMsExclusive": 3000,
+    "projectionLagP95TargetSecondsInclusive": 30,
+    "reportErrorsAndTimeoutsSeparately": true,
+    "hardwareAndPayloadDeclarationRequired": true
+  },
+  "alertPlan": {
+    "status": "not-run",
+    "eligibleJobsPerMinute": 1000,
+    "measuredMinutes": 10,
+    "eligibilityProcessingP95TargetSecondsInclusive": 60,
+    "postDependencyRestoreRecoveryTargetSecondsInclusive": 300,
+    "externalDeliveryExcludedFromLatencyTarget": true,
+    "persistedDeadlineRecoveryRequired": true,
+    "exactlyOnceExternalDeliveryClaimAllowed": false
+  },
+  "plannerPlan": {
+    "status": "not-run",
+    "maxCases": 50,
+    "maxExperts": 20,
+    "horizonWorkingDays": 30,
+    "maxScenariosPerCase": 3,
+    "solverBudgetSecondsPerScenario": 5,
+    "methods": ["fifo-with-reminders", "earliest-deadline-first", "dependency-only", "full-resource-aware"],
+    "tuningSeeds": [26262, 26263, 26264],
+    "heldOutSeeds": [26270, 26271, 26272, 26273, 26274],
+    "repetitionsPerSeed": 3,
+    "sharedInputsRequired": ["rules", "duration assumptions", "initial workloads", "permitted interventions", "calendars", "hard constraints"],
+    "metrics": ["late task count", "weighted lateness", "hard constraint violations", "rescheduling disruption", "workload balance", "runtime", "explanation correctness"],
+    "hardConstraintViolationTarget": 0,
+    "recordSolverThreadsSeedVersionAndStatus": true,
+    "separateTimeoutFromInfeasible": true,
+    "claimedImprovementPercent": null
+  },
+  "evidencePlan": {
+    "runtimeRunStatus": "not-run",
+    "runIdRequired": true,
+    "recordCommitPolicyDataHashesAndReferenceTime": true,
+    "recordHardwareRuntimeConfigurationAndFaultTimeline": true,
+    "recordIntendedAndAcknowledgedExternalEffects": true,
+    "requiredReports": ["pendency", "evc", "undertakings", "document-validity", "overdue", "regional-performance"],
+    "requiredFaults": ["duplicate event", "out-of-order event", "stale version", "unknown writeback", "worker restart", "mail outage", "renewal dispatch race"],
+    "rawResultOutputDirectory": "evaluation-results/",
+    "participantOutputDirectory": "participant-study/"
+  },
+  "pilotTaskTimingPlan": {
+    "status": "not-run-not-recruited",
+    "consentRequired": true,
+    "pairedTaskDesign": true,
+    "counterbalanceOrder": true,
+    "targetParticipantsProposed": 5,
+    "minimumActualParticipantsForResults": 1,
+    "lowSampleMustBeLabelledFormative": true,
+    "actualParticipantCount": 0,
+    "measure": ["completion", "elapsed time", "manual follow-ups", "errors", "assistance required", "status comprehension"],
+    "noOperationalSavingsClaimFromSyntheticBenchmarks": true
+  }
+}
