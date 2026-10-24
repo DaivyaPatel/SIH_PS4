@@ -67,7 +67,7 @@ Suggested parallel workstreams after M1: workflow/clocks; evidence/compliance; E
 **P0 · M · Owner: product + INT · Depends: none · Maps: INT-01; D01–D02; G0**
 
 - [x] T001.1 Inventory the repository/host when supplied: architecture, auth, entities, status model, API/event/export/embedding capabilities and ownership. Evidence: [repository and host inventory](../docs/discovery/host-inventory.md). No executable host has been supplied; real-host discovery reopens when one is provided.
-- [ ] T001.2 Create field/entity ownership matrix and delegated-action allowlist, including official facts/decisions versus service-owned tasks/timers.
+- [x] T001.2 Create field/entity ownership matrix and delegated-action allowlist, including official facts/decisions versus service-owned tasks/timers. Evidence: [source-of-truth and delegated-action contract](../docs/discovery/ownership-and-authority.md); live entitlements remain ungranted.
 - [ ] T001.3 Choose sanctioned host integration or labelled synthetic reference host; document capability flags, read-only fallback and freshness contract.
 - [ ] T001.4 Assign named owners and required-by gates for D01–D12; record permissions and unanswered questions.
 

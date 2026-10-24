@@ -12,6 +12,7 @@ Discovery is in progress. This repository currently contains planning and resear
 - [Delivery backlog and progress](./files/tickets.md)
 - [Consolidated research context](./files/AICTE_Workflow_Master_Context.md)
 - [Host and repository inventory](./docs/discovery/host-inventory.md)
+- [Source of truth and delegated actions](./docs/discovery/ownership-and-authority.md)
 - [Contribution and branch workflow](./CONTRIBUTING.md)
 
 ## Getting started
