@@ -68,7 +68,7 @@ Suggested parallel workstreams after M1: workflow/clocks; evidence/compliance; E
 
 - [x] T001.1 Inventory the repository/host when supplied: architecture, auth, entities, status model, API/event/export/embedding capabilities and ownership. Evidence: [repository and host inventory](../docs/discovery/host-inventory.md). No executable host has been supplied; real-host discovery reopens when one is provided.
 - [x] T001.2 Create field/entity ownership matrix and delegated-action allowlist, including official facts/decisions versus service-owned tasks/timers. Evidence: [source-of-truth and delegated-action contract](../docs/discovery/ownership-and-authority.md); live entitlements remain ungranted.
-- [ ] T001.3 Choose sanctioned host integration or labelled synthetic reference host; document capability flags, read-only fallback and freshness contract.
+- [x] T001.3 Choose sanctioned host integration or labelled synthetic reference host; document capability flags, read-only fallback and freshness contract. Evidence: [initial integration decision](../docs/discovery/integration-mode.md) and [inactive design profiles](../config/discovery/integration-profiles.json); selected synthetic reference host, no runtime/live integration claimed.
 - [ ] T001.4 Assign named owners and required-by gates for D01–D12; record permissions and unanswered questions.
 
 **Acceptance:** one concrete initial integration path is selected; unsupported actions are visibly disabled in the design. No public AICTE API or write entitlement is presumed. Lack of production access has an actionable reference-host fallback.
