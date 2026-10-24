@@ -1,0 +1,35 @@
+# Credentials and local environment
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Dependencies and generated output
+node_modules/
+target/
+dist/
+build/
+coverage/
+.gradle/
+.venv/
+__pycache__/
+*.pyc
+*.log
+
+# Local runtime data and evidence (never commit institutional records)
+.local/
+runtime-data/
+uploads/
+backups/
+
+# Editor and OS state
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+~$*

@@ -36,9 +36,9 @@ All three supplied sources were read, including the Word document paragraphs and
 
 | Input | Contribution | Treatment |
 |---|---|---|
-| [AICTE_Workflow_Master_Context.md](./files/AICTE_Workflow_Master_Context.md) | Consolidated architecture, eight capability groups, planner, security and deployment | Primary product synthesis; preserve its explicit unknowns |
-| [Workflow Automation Project context.docx](./files/Workflow%20Automation%20Project%20context.docx) | Detailed feature behaviour, negative cases, integration hierarchy and evaluation | Expanded into requirements and acceptance scenarios |
-| [AICTE's existing approval workflow.docx](./files/AICTE%27s%20existing%20approval%20workflow.docx) | Existing process and stakeholder baseline | Contextual research, partly from older sources; not an executable rulebook |
+| [AICTE_Workflow_Master_Context.md](./AICTE_Workflow_Master_Context.md) | Consolidated architecture, eight capability groups, planner, security and deployment | Primary product synthesis; preserve its explicit unknowns |
+| [Workflow Automation Project context.docx](./Workflow%20Automation%20Project%20context.docx) | Detailed feature behaviour, negative cases, integration hierarchy and evaluation | Expanded into requirements and acceptance scenarios |
+| [AICTE's existing approval workflow.docx](./AICTE%27s%20existing%20approval%20workflow.docx) | Existing process and stakeholder baseline | Contextual research, partly from older sources; not an executable rulebook |
 | User-provided problem statement | A–F, outcomes, evaluation and regulatory safeguard | Mandatory scope and ultimate product intent |
 
 Evidence labels throughout: **V** = verified source fact within stated scope; **P** = proposed product/design choice; **U** = unresolved owner/regulatory decision. All numerical service targets and synthetic scenarios are P.
