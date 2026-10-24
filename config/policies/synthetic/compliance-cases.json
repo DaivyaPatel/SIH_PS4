@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+  "policyVersion": "demo-2026-v1",
+  "academicYear": "DEMO-2026",
+  "ownerApproved": false,
+  "productionActivationAllowed": false,
+  "runtimeActivationAllowed": false,
+  "clockCases": [
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "weekend-and-demo-holiday",
+      "anchor": "2026-10-23",
+      "offsetWorkingDays": 2,
+      "expectedDueDate": "2026-10-28"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "zero-offset",
+      "anchor": "2026-10-23",
+      "offsetWorkingDays": 0,
+      "expectedDueDate": "2026-10-23"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "ordinary-weekend",
+      "anchor": "2026-11-06",
+      "offsetWorkingDays": 1,
+      "expectedDueDate": "2026-11-09"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "leap-day",
+      "anchor": "2028-02-28",
+      "offsetWorkingDays": 1,
+      "expectedDueDate": "2028-02-29"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "year-boundary",
+      "anchor": "2026-12-31",
+      "offsetWorkingDays": 1,
+      "expectedDueDate": "2027-01-01"
+    }
+  ],
+  "deadlineCases": [
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "just-before-boundary",
+      "dueDate": "2026-10-25",
+      "now": "2026-10-25T18:29:59+00:00",
+      "expectedOverdue": false
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "at-boundary",
+      "dueDate": "2026-10-25",
+      "now": "2026-10-25T18:30:00+00:00",
+      "expectedOverdue": true
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "missing-due",
+      "dueDate": null,
+      "now": "2026-10-25T18:30:00+00:00",
+      "expectedOverdue": null
+    }
+  ],
+  "submissionCases": [
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "timely-awaiting-review",
+      "dueDate": "2026-10-25",
+      "submittedAt": "2026-10-25T18:29:59+00:00",
+      "receivedByServiceAt": "2026-10-27T00:00:00+00:00",
+      "reviewStatus": "PENDING",
+      "expected": "SUBMITTED_ON_TIME_AWAITING_REVIEW"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "late-awaiting-review",
+      "dueDate": "2026-10-25",
+      "submittedAt": "2026-10-25T18:30:00+00:00",
+      "reviewStatus": "PENDING",
+      "expected": "SUBMITTED_LATE_AWAITING_REVIEW"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "missing-overdue",
+      "dueDate": "2026-10-25",
+      "submittedAt": null,
+      "now": "2026-10-25T18:30:00+00:00",
+      "reviewStatus": "PENDING",
+      "expected": "NO_SUBMISSION_OVERDUE"
+    }
+  ],
+  "validityCases": [
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "valid-horizon",
+      "asOfDate": "2026-10-25",
+      "acceptedExpiry": "2032-01-01",
+      "requiredHorizon": "2030-10-25",
+      "expected": "VALID_FOR_DEMO_HORIZON"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "valid-insufficient",
+      "asOfDate": "2026-10-25",
+      "acceptedExpiry": "2029-01-01",
+      "requiredHorizon": "2030-10-25",
+      "expected": "INSUFFICIENT_REMAINING_VALIDITY"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "ambiguous-date",
+      "asOfDate": "2026-10-25",
+      "acceptedExpiry": "04/05/2027",
+      "requiredHorizon": null,
+      "expected": "UNKNOWN_REQUIRES_REVIEW"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "unknown-expiry",
+      "asOfDate": "2026-10-25",
+      "acceptedExpiry": null,
+      "requiredHorizon": "2030-10-25",
+      "expected": "UNKNOWN_REQUIRES_REVIEW"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "no-expiry-applicable",
+      "asOfDate": "2026-10-25",
+      "acceptedExpiry": null,
+      "requiredHorizon": null,
+      "expected": "NO_EXPIRY_REQUIRED",
+      "noExpiryRequired": true
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "expired-renewal-pending",
+      "asOfDate": "2026-10-25",
+      "acceptedExpiry": "2026-10-24",
+      "requiredHorizon": null,
+      "expected": "EXPIRED_RENEWAL_PENDING_REVIEW",
+      "renewalExpiry": "2035-01-01",
+      "renewalAccepted": false
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "accepted-renewal",
+      "asOfDate": "2026-10-25",
+      "acceptedExpiry": "2026-10-24",
+      "requiredHorizon": "2030-10-25",
+      "expected": "VALID_FOR_DEMO_HORIZON",
+      "renewalExpiry": "2035-01-01",
+      "renewalAccepted": true
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "equal-demo-horizon",
+      "asOfDate": "2026-10-25",
+      "acceptedExpiry": "2030-10-25",
+      "requiredHorizon": "2030-10-25",
+      "expected": "VALID_FOR_DEMO_HORIZON"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "on-expiry-date",
+      "asOfDate": "2026-10-25",
+      "acceptedExpiry": "2026-10-25",
+      "requiredHorizon": null,
+      "expected": "CURRENTLY_VALID"
+    }
+  ],
+  "notificationCases": [
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "submitted-at-dispatch",
+      "pendingAction": "reviewPending",
+      "sourceFresh": true,
+      "submissionObserved": true,
+      "expectedRecipient": "assigned_verifier",
+      "expectedMissingSubmissionNotice": false
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "source-outage",
+      "pendingAction": "sourceStale",
+      "sourceFresh": false,
+      "submissionObserved": false,
+      "expectedRecipient": "integration_support",
+      "expectedMissingSubmissionNotice": false
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "missing-current",
+      "pendingAction": "noSubmission",
+      "sourceFresh": true,
+      "submissionObserved": false,
+      "expectedRecipient": "institution",
+      "expectedMissingSubmissionNotice": true
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "delivery-failed",
+      "pendingAction": "deliveryFailure",
+      "sourceFresh": true,
+      "submissionObserved": false,
+      "expectedRecipient": "operations",
+      "expectedMissingSubmissionNotice": false
+    }
+  ]
+}

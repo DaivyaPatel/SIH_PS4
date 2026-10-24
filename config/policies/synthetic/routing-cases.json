@@ -1,0 +1,988 @@
+{
+  "schemaVersion": 1,
+  "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+  "policyVersion": "demo-2026-v1",
+  "academicYear": "DEMO-2026",
+  "ownerApproved": false,
+  "productionActivationAllowed": false,
+  "runtimeActivationAllowed": false,
+  "cases": [
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-initial",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "ROUTE_PENDING",
+      "event": "RESOLVE_ROUTE",
+      "actorRole": "institution",
+      "facts": {},
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "SCRUTINY",
+        "nextRole": "scrutiny_reviewer",
+        "regulatoryApprovalInferred": false
+      },
+      "category": "DEMO-CATEGORY-A"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-proceed",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "SCRUTINY",
+      "event": "RECORD_PROCEED",
+      "actorRole": "scrutiny_reviewer",
+      "facts": {
+        "reportAccepted": true,
+        "reviewAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_PENDING",
+        "nextRole": "competent_authority",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-deficiency",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "SCRUTINY",
+      "event": "RAISE_DEFICIENCY",
+      "actorRole": "scrutiny_reviewer",
+      "facts": {
+        "reviewAuthorityConfirmed": true
+      },
+      "reason": "Missing requested evidence",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DEFICIENCY_RESPONSE",
+        "nextRole": "institution",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-response",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "DEFICIENCY_RESPONSE",
+      "event": "SUBMIT_RESPONSE",
+      "actorRole": "institution",
+      "facts": {
+        "scopedSubmissionConfirmed": true,
+        "responseComplete": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "RESCRUTINY",
+        "nextRole": "rescrutiny_reviewer",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-rereview",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "RESCRUTINY",
+      "event": "RECORD_PROCEED",
+      "actorRole": "rescrutiny_reviewer",
+      "facts": {
+        "reportAccepted": true,
+        "reviewAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_PENDING",
+        "nextRole": "competent_authority",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-source-decision",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "DECISION_PENDING",
+      "event": "RECORD_SOURCE_DECISION",
+      "actorRole": "competent_authority",
+      "facts": {
+        "sourceDecisionConfirmed": true,
+        "decisionAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_RECORDED",
+        "nextRole": null,
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-no-auto-decision",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "DECISION_PENDING",
+      "event": "RECORD_SOURCE_DECISION",
+      "actorRole": "competent_authority",
+      "facts": {
+        "sourceDecisionConfirmed": false,
+        "decisionAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "PREREQUISITE_MISSING",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-conditional-hearing",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "SCRUTINY",
+      "event": "REQUEST_HEARING",
+      "actorRole": "hearing_authority",
+      "facts": {
+        "hearingApplicable": true,
+        "hearingAuthorityConfirmed": true
+      },
+      "reason": "Applicable synthetic hearing",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "SHC",
+        "nextRole": "hearing_authority",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-hearing-not-applicable",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "SCRUTINY",
+      "event": "REQUEST_HEARING",
+      "actorRole": "hearing_authority",
+      "facts": {
+        "hearingApplicable": false,
+        "hearingAuthorityConfirmed": true
+      },
+      "reason": "Not permitted",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "PREREQUISITE_MISSING",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-appeal",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "DECISION_RECORDED",
+      "event": "REQUEST_APPEAL",
+      "actorRole": "institution",
+      "facts": {
+        "appealApplicable": true,
+        "appealUnused": true,
+        "appealWindowConfirmed": true,
+        "sourceDecisionConfirmed": true
+      },
+      "reason": "Synthetic appeal requested",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "SAC",
+        "nextRole": "appeal_committee",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-hearing-outcome",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "SHC",
+      "event": "RECORD_HEARING_RECOMMENDATION",
+      "actorRole": "hearing_authority",
+      "facts": {
+        "reportAccepted": true,
+        "hearingAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_PENDING",
+        "nextRole": "competent_authority",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-appeal-outcome",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "SAC",
+      "event": "RECORD_APPEAL_RECOMMENDATION",
+      "actorRole": "appeal_committee",
+      "facts": {
+        "reportAccepted": true,
+        "appealAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_PENDING",
+        "nextRole": "competent_authority",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-closure",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "DECISION_RECORDED",
+      "event": "CLOSE_PROCESSING",
+      "actorRole": "competent_authority",
+      "facts": {
+        "sourceDecisionConfirmed": true,
+        "closureAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "PROCESSING_CLOSED",
+        "nextRole": null,
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC-initial",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "ROUTE_PENDING",
+      "event": "RESOLVE_ROUTE",
+      "actorRole": "institution",
+      "facts": {},
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "SCRUTINY",
+        "nextRole": "scrutiny_reviewer",
+        "regulatoryApprovalInferred": false
+      },
+      "category": "DEMO-CATEGORY-B"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC-proceed",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "SCRUTINY",
+      "event": "RECORD_PROCEED",
+      "actorRole": "scrutiny_reviewer",
+      "facts": {
+        "reportAccepted": true,
+        "reviewAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "EVC",
+        "nextRole": "evc_coordinator",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC-deficiency",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "SCRUTINY",
+      "event": "RAISE_DEFICIENCY",
+      "actorRole": "scrutiny_reviewer",
+      "facts": {
+        "reviewAuthorityConfirmed": true
+      },
+      "reason": "Missing requested evidence",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DEFICIENCY_RESPONSE",
+        "nextRole": "institution",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC-response",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "DEFICIENCY_RESPONSE",
+      "event": "SUBMIT_RESPONSE",
+      "actorRole": "institution",
+      "facts": {
+        "scopedSubmissionConfirmed": true,
+        "responseComplete": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "RESCRUTINY",
+        "nextRole": "rescrutiny_reviewer",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC-rereview",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "RESCRUTINY",
+      "event": "RECORD_PROCEED",
+      "actorRole": "rescrutiny_reviewer",
+      "facts": {
+        "reportAccepted": true,
+        "reviewAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "EVC",
+        "nextRole": "evc_coordinator",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC-source-decision",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "DECISION_PENDING",
+      "event": "RECORD_SOURCE_DECISION",
+      "actorRole": "competent_authority",
+      "facts": {
+        "sourceDecisionConfirmed": true,
+        "decisionAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_RECORDED",
+        "nextRole": null,
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC-no-auto-decision",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "DECISION_PENDING",
+      "event": "RECORD_SOURCE_DECISION",
+      "actorRole": "competent_authority",
+      "facts": {
+        "sourceDecisionConfirmed": false,
+        "decisionAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "PREREQUISITE_MISSING",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC-conditional-hearing",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "SCRUTINY",
+      "event": "REQUEST_HEARING",
+      "actorRole": "hearing_authority",
+      "facts": {
+        "hearingApplicable": true,
+        "hearingAuthorityConfirmed": true
+      },
+      "reason": "Applicable synthetic hearing",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "SHC",
+        "nextRole": "hearing_authority",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC-hearing-not-applicable",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "SCRUTINY",
+      "event": "REQUEST_HEARING",
+      "actorRole": "hearing_authority",
+      "facts": {
+        "hearingApplicable": false,
+        "hearingAuthorityConfirmed": true
+      },
+      "reason": "Not permitted",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "PREREQUISITE_MISSING",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC-appeal",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "DECISION_RECORDED",
+      "event": "REQUEST_APPEAL",
+      "actorRole": "institution",
+      "facts": {
+        "appealApplicable": true,
+        "appealUnused": true,
+        "appealWindowConfirmed": true,
+        "sourceDecisionConfirmed": true
+      },
+      "reason": "Synthetic appeal requested",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "SAC",
+        "nextRole": "appeal_committee",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC-hearing-outcome",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "SHC",
+      "event": "RECORD_HEARING_RECOMMENDATION",
+      "actorRole": "hearing_authority",
+      "facts": {
+        "reportAccepted": true,
+        "hearingAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_PENDING",
+        "nextRole": "competent_authority",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC-appeal-outcome",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "SAC",
+      "event": "RECORD_APPEAL_RECOMMENDATION",
+      "actorRole": "appeal_committee",
+      "facts": {
+        "reportAccepted": true,
+        "appealAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_PENDING",
+        "nextRole": "competent_authority",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-SCRUTINY-EVC-closure",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "DECISION_RECORDED",
+      "event": "CLOSE_PROCESSING",
+      "actorRole": "competent_authority",
+      "facts": {
+        "sourceDecisionConfirmed": true,
+        "closureAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "PROCESSING_CLOSED",
+        "nextRole": null,
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-EVC-initial",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "ROUTE_PENDING",
+      "event": "RESOLVE_ROUTE",
+      "actorRole": "institution",
+      "facts": {},
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "EVC",
+        "nextRole": "evc_coordinator",
+        "regulatoryApprovalInferred": false
+      },
+      "category": "DEMO-CATEGORY-C"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-EVC-source-decision",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "DECISION_PENDING",
+      "event": "RECORD_SOURCE_DECISION",
+      "actorRole": "competent_authority",
+      "facts": {
+        "sourceDecisionConfirmed": true,
+        "decisionAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_RECORDED",
+        "nextRole": null,
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-EVC-no-auto-decision",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "DECISION_PENDING",
+      "event": "RECORD_SOURCE_DECISION",
+      "actorRole": "competent_authority",
+      "facts": {
+        "sourceDecisionConfirmed": false,
+        "decisionAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "PREREQUISITE_MISSING",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-EVC-conditional-hearing",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "EVC",
+      "event": "REQUEST_HEARING",
+      "actorRole": "hearing_authority",
+      "facts": {
+        "hearingApplicable": true,
+        "hearingAuthorityConfirmed": true
+      },
+      "reason": "Applicable synthetic hearing",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "SHC",
+        "nextRole": "hearing_authority",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-EVC-hearing-not-applicable",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "EVC",
+      "event": "REQUEST_HEARING",
+      "actorRole": "hearing_authority",
+      "facts": {
+        "hearingApplicable": false,
+        "hearingAuthorityConfirmed": true
+      },
+      "reason": "Not permitted",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "PREREQUISITE_MISSING",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-EVC-appeal",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "DECISION_RECORDED",
+      "event": "REQUEST_APPEAL",
+      "actorRole": "institution",
+      "facts": {
+        "appealApplicable": true,
+        "appealUnused": true,
+        "appealWindowConfirmed": true,
+        "sourceDecisionConfirmed": true
+      },
+      "reason": "Synthetic appeal requested",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "SAC",
+        "nextRole": "appeal_committee",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-EVC-hearing-outcome",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "SHC",
+      "event": "RECORD_HEARING_RECOMMENDATION",
+      "actorRole": "hearing_authority",
+      "facts": {
+        "reportAccepted": true,
+        "hearingAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_PENDING",
+        "nextRole": "competent_authority",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-EVC-appeal-outcome",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "SAC",
+      "event": "RECORD_APPEAL_RECOMMENDATION",
+      "actorRole": "appeal_committee",
+      "facts": {
+        "reportAccepted": true,
+        "appealAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_PENDING",
+        "nextRole": "competent_authority",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "DEMO-EVC-closure",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "DECISION_RECORDED",
+      "event": "CLOSE_PROCESSING",
+      "actorRole": "competent_authority",
+      "facts": {
+        "sourceDecisionConfirmed": true,
+        "closureAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "PROCESSING_CLOSED",
+        "nextRole": null,
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "wrong-role",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "SCRUTINY",
+      "event": "RECORD_PROCEED",
+      "actorRole": "institution",
+      "facts": {
+        "reportAccepted": true,
+        "reviewAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "UNAUTHORISED_ROLE",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "reason-required",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "SCRUTINY",
+      "event": "RAISE_DEFICIENCY",
+      "actorRole": "scrutiny_reviewer",
+      "facts": {
+        "reviewAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "REASON_REQUIRED",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "unknown-route",
+      "routeId": "UNKNOWN",
+      "academicYear": "DEMO-2026",
+      "stage": "SCRUTINY",
+      "event": "RECORD_PROCEED",
+      "actorRole": "scrutiny_reviewer",
+      "facts": {},
+      "reason": "",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "POLICY_CLARIFICATION",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "partial-response",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "DEFICIENCY_RESPONSE",
+      "event": "SUBMIT_PARTIAL_RESPONSE",
+      "actorRole": "institution",
+      "facts": {
+        "scopedSubmissionConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DEFICIENCY_RESPONSE",
+        "nextRole": "institution",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "repeat-deficiency",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "RESCRUTINY",
+      "event": "RAISE_DEFICIENCY",
+      "actorRole": "rescrutiny_reviewer",
+      "facts": {
+        "reviewAuthorityConfirmed": true
+      },
+      "reason": "Further allowed clarification",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DEFICIENCY_RESPONSE",
+        "nextRole": "institution",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "negative-review",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "DEMO-2026",
+      "stage": "SCRUTINY",
+      "event": "RECORD_NOT_RECOMMENDED",
+      "actorRole": "scrutiny_reviewer",
+      "facts": {
+        "reportAccepted": true,
+        "reviewAuthorityConfirmed": true
+      },
+      "reason": "Negative recommendation is not refusal",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_PENDING",
+        "nextRole": "competent_authority",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "evc-proceed",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "EVC",
+      "event": "RECORD_PROCEED",
+      "actorRole": "evc_reporter",
+      "facts": {
+        "preliminaryProcessingComplete": true,
+        "visitConducted": true,
+        "reportAccepted": true,
+        "reviewAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_PENDING",
+        "nextRole": "competent_authority",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "evc-not-conducted",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "EVC",
+      "event": "RECORD_PROCEED",
+      "actorRole": "evc_reporter",
+      "facts": {
+        "preliminaryProcessingComplete": true,
+        "visitConducted": false,
+        "reportAccepted": true,
+        "reviewAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "PREREQUISITE_MISSING",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "return-with-reason",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "EVC",
+      "event": "AUTHORISED_RETURN",
+      "actorRole": "competent_authority",
+      "facts": {
+        "returnAuthorityConfirmed": true
+      },
+      "reason": "Further verification",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "SCRUTINY",
+        "nextRole": "scrutiny_reviewer",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "return-without-reason",
+      "routeId": "DEMO-SCRUTINY-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "EVC",
+      "event": "AUTHORISED_RETURN",
+      "actorRole": "competent_authority",
+      "facts": {
+        "returnAuthorityConfirmed": true
+      },
+      "reason": "",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "REASON_REQUIRED",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "return-not-in-route",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "EVC",
+      "event": "AUTHORISED_RETURN",
+      "actorRole": "competent_authority",
+      "facts": {
+        "returnAuthorityConfirmed": true
+      },
+      "reason": "Cannot invent scrutiny stage",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "TRANSITION_NOT_ALLOWED",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "appeal-used",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "DECISION_RECORDED",
+      "event": "REQUEST_APPEAL",
+      "actorRole": "institution",
+      "facts": {
+        "appealApplicable": true,
+        "appealUnused": false,
+        "appealWindowConfirmed": true,
+        "sourceDecisionConfirmed": true
+      },
+      "reason": "Repeated appeal",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "PREREQUISITE_MISSING",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "wrong-year",
+      "routeId": "DEMO-SCRUTINY",
+      "academicYear": "UNMAPPED-YEAR",
+      "stage": "ROUTE_PENDING",
+      "event": "RESOLVE_ROUTE",
+      "actorRole": "institution",
+      "facts": {},
+      "reason": "",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "POLICY_CLARIFICATION",
+        "regulatoryApprovalInferred": false
+      },
+      "category": "DEMO-CATEGORY-A"
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "unknown-category",
+      "routeId": "DEMO-SCRUTINY",
+      "category": "UNMAPPED-CATEGORY",
+      "academicYear": "DEMO-2026",
+      "stage": "ROUTE_PENDING",
+      "event": "RESOLVE_ROUTE",
+      "actorRole": "institution",
+      "facts": {},
+      "reason": "",
+      "expected": {
+        "result": "BLOCKED",
+        "code": "POLICY_CLARIFICATION",
+        "regulatoryApprovalInferred": false
+      }
+    },
+    {
+      "sourceMarker": "SYNTHETIC_NOT_REGULATORY",
+      "id": "evc-negative-review",
+      "routeId": "DEMO-EVC",
+      "academicYear": "DEMO-2026",
+      "stage": "EVC",
+      "event": "RECORD_NOT_RECOMMENDED",
+      "actorRole": "evc_reporter",
+      "facts": {
+        "visitConducted": true,
+        "reportAccepted": true,
+        "reviewAuthorityConfirmed": true
+      },
+      "reason": "Negative synthetic report, no autonomous refusal",
+      "expected": {
+        "result": "TRANSITION",
+        "nextStage": "DECISION_PENDING",
+        "nextRole": "competent_authority",
+        "regulatoryApprovalInferred": false
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Delivery backlog: AICTE approval orchestration and compliance
 
-Version: 1.0 | Updated: 25 October 2026 | Status: repository setup and first discovery ticket complete; application implementation not started
+Version: 1.0 | Updated: 25 October 2026 | Status: repository setup and first two discovery tickets complete for prototype scope; application runtime not started
 
 Product authority: [MASTER_PRD.md](./MASTER_PRD.md). Source context: [research folder](./). Requirement IDs, acceptance scenarios AT-01–AT-20 and gates G0–G4 refer to the PRD. Checkboxes and linked evidence track progress; unchecked work remains TODO. No ticket is completed merely because this backlog exists.
 
@@ -79,11 +79,13 @@ Suggested parallel workstreams after M1: workflow/clocks; evidence/compliance; E
 
 **P0 · M · Owner: process analyst + product · Depends: none · Maps: POL-01, WF-01, CLK-01; D03–D08**
 
+**Status: DONE for prototype research and synthetic specification.** Real regulatory approval/current corpus completeness remain blocked; this does not complete E00/G0. Evidence: source register, synthetic fixtures/offline checks and the unapproved owner-review checklist linked below.
+
 - [x] T002.1 Catalogue APH, amendments, annual notices/orders and older-source limitations with document checksum, clause/page, applicability and supersession evidence. Evidence: [source catalogue](../docs/regulatory/source-register.md), [canonical metadata](../config/regulatory/source-register.json) and offline checksum verification; current corpus completeness is not claimed.
 - [x] T002.2 Obtain authoritative replacement for the failed updated-addendum URL where possible; unresolved text remains an explicit activation blocker. Evidence: [retrieved government-hosted amendment copy and exact-version gaps](../docs/regulatory/amendment-review.md). Candidate copy retrieved; equivalence/latest applicability and owner approval remain blocked.
-- [ ] T002.3 Produce synthetic scrutiny-only, scrutiny + EVC and EVC-only tables with conditional hearing/appeal, deficiency loop, negative outcomes and expected next roles.
-- [ ] T002.4 Define demo calendar, obligation/evidence/lease rules, offsets and escalation recipients; label every synthetic rule.
-- [ ] T002.5 Prepare a process-owner validation checklist; distinguish research verification from production approval.
+- [x] T002.3 Produce synthetic scrutiny-only, scrutiny + EVC and EVC-only tables with conditional hearing/appeal, deficiency loop, negative outcomes and expected next roles. Evidence: [three route definitions and 50 expected routing cases](../docs/regulatory/synthetic-policy-guide.md); offline reference check passes, backend implementation remains future work.
+- [x] T002.4 Define demo calendar, obligation/evidence/lease rules, offsets and escalation recipients; label every synthetic rule. Evidence: [demo rules, examples and 24 expected compliance cases](../config/policies/synthetic/); all synthetic/activation guards pass.
+- [x] T002.5 Prepare a process-owner validation checklist; distinguish research verification from production approval. Evidence: [unapproved owner-review/activation checklist](../docs/regulatory/process-owner-validation.md); no actual reviewer or sign-off invented.
 
 **Acceptance:** each fixture has inputs, expected transition, source/synthetic marker and reviewer status. SHC/SAC differ. No invented universal EVC deadline or automatically activated base-APH rule. Production sign-off remains gated by the current complete corpus.
 

@@ -32,6 +32,11 @@ backups/
 /regulatory-cache/
 /review-exports/
 
+# Offline fixture validation output and future local test caches
+/fixture-results/
+.pytest_cache/
+.ruff_cache/
+
 # Editor and OS state
 .idea/
 .vscode/
