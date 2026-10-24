@@ -15,6 +15,8 @@ Repository setup and the first discovery ticket are complete. The rest of discov
 - [Source of truth and delegated actions](./docs/discovery/ownership-and-authority.md)
 - [Initial integration decision](./docs/discovery/integration-mode.md)
 - [Decision owners, gates and outstanding approvals](./docs/discovery/decision-register.md)
+- [Regulatory source register](./docs/regulatory/source-register.md)
+- [Amendment findings and remaining gaps](./docs/regulatory/amendment-review.md)
 - [Contribution and branch workflow](./CONTRIBUTING.md)
 
 ## Getting started
@@ -25,6 +27,10 @@ Use synthetic data for development. Do not commit credentials, government record
 
 Next work: establish the regulatory source/fixture baseline and prove the technology/transaction choices before scaffolding application modules. See the backlog dependencies for the delivery order.
 
+The regulatory source catalogue now records downloaded-PDF checksums, clause/page anchors, supplied-context hashes and unavailable endpoints. A government-hosted 2026–27 amendment copy was retrieved; its equivalence to the unavailable Updated file and completeness of later notices remain unconfirmed. No real policy is activated.
+
+Run the offline provenance check with `python scripts/check_source_register.py`. If public PDFs have been downloaded into ignored local research storage, add `--cache-dir .local/research` to verify their hashes. No keys, models or third-party Python dependencies are needed for this check.
+
 ## Delivery workflow
 
-Each completed subticket is developed on a new branch, committed with a descriptive message without ticket identifiers, pushed, merged into `main` and followed by a push of `main`. The backlog and discovery evidence are updated with the work. See the contribution guide for exact steps and safeguards.
+Group two or three coherent subtickets per commit, use a descriptive topic branch, push it, merge into `main` and push `main`. Commit and merge messages contain no ticket identifiers. Review/update this README and `.gitignore` with each task commit. Keep the backlog/evidence current and ask before required keys, model/provider choices or external service setup. See the contribution guide for exact steps and safeguards.

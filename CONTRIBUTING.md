@@ -4,9 +4,11 @@
 
 Use the [backlog](./files/tickets.md) and [PRD](./files/MASTER_PRD.md). Complete only the authorised work; keep synthetic/reference-host behaviour distinct from real AICTE capabilities. Mark a subtask complete only when its deliverable and validation exist. An external approval remains pending until the actual authority provides it.
 
-## One branch per subticket
+## Grouped subtickets and branch workflow
 
-Start from a clean `main` synced with `origin/main`. Create a descriptive branch such as `docs/host-inventory` or `feat/source-mapping`. After completing the subtask, review the diff, run appropriate checks and update its backlog checkbox/evidence. Stage only intended changes.
+Start from a clean `main` synced with `origin/main`. Group two or three coherent subtickets per commit on a descriptive branch such as `docs/regulatory-source-baseline` or `feat/source-mapping`. Review the diff, run appropriate checks and update completed backlog checkboxes/evidence. Stage only intended changes; unfinished acceptance remains unchecked.
+
+Review and update [README.md](./README.md) and [.gitignore](./.gitignore) with every task commit: describe current progress/setup/checks and add relevant local/generated/secret exclusions. Do not add arbitrary ignore patterns solely to produce a diff. Ask the project owner before introducing required API keys, model/provider choices, paid services or other external setup; never ask them to paste secrets into Git or a committed file. Public-source research and offline fixture checks need no model/key.
 
 Commit messages use descriptive conventional subjects such as `docs: record host integration inventory`. Do not include ticket IDs or ticket names in commit subjects, bodies or merge messages. Keep messages at most 72 characters on the subject line.
 

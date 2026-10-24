@@ -79,8 +79,8 @@ Suggested parallel workstreams after M1: workflow/clocks; evidence/compliance; E
 
 **P0 · M · Owner: process analyst + product · Depends: none · Maps: POL-01, WF-01, CLK-01; D03–D08**
 
-- [ ] T002.1 Catalogue APH, amendments, annual notices/orders and older-source limitations with document checksum, clause/page, applicability and supersession evidence.
-- [ ] T002.2 Obtain authoritative replacement for the failed updated-addendum URL where possible; unresolved text remains an explicit activation blocker.
+- [x] T002.1 Catalogue APH, amendments, annual notices/orders and older-source limitations with document checksum, clause/page, applicability and supersession evidence. Evidence: [source catalogue](../docs/regulatory/source-register.md), [canonical metadata](../config/regulatory/source-register.json) and offline checksum verification; current corpus completeness is not claimed.
+- [x] T002.2 Obtain authoritative replacement for the failed updated-addendum URL where possible; unresolved text remains an explicit activation blocker. Evidence: [retrieved government-hosted amendment copy and exact-version gaps](../docs/regulatory/amendment-review.md). Candidate copy retrieved; equivalence/latest applicability and owner approval remain blocked.
 - [ ] T002.3 Produce synthetic scrutiny-only, scrutiny + EVC and EVC-only tables with conditional hearing/appeal, deficiency loop, negative outcomes and expected next roles.
 - [ ] T002.4 Define demo calendar, obligation/evidence/lease rules, offsets and escalation recipients; label every synthetic rule.
 - [ ] T002.5 Prepare a process-owner validation checklist; distinguish research verification from production approval.
