@@ -1,6 +1,8 @@
 package in.sih.aicte.evc;
 
+import in.sih.aicte.api.CorrelationFilter;
 import in.sih.aicte.cases.Region;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -8,6 +10,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,9 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class ExpertController {
 
     private final ExpertPoolService expertService;
+    private final EvcConstraintSchedulerService schedulerService;
 
-    public ExpertController(ExpertPoolService expertService) {
+    public ExpertController(
+            ExpertPoolService expertService,
+            EvcConstraintSchedulerService schedulerService
+    ) {
         this.expertService = expertService;
+        this.schedulerService = schedulerService;
     }
 
     @GetMapping("/experts")
@@ -43,5 +52,14 @@ public class ExpertController {
             @RequestParam(required = false) String requiredDomain
     ) {
         return expertService.findEligibleExpertsForCase(caseId, targetDate, requiredDomain);
+    }
+
+    @PostMapping("/optimize-schedule")
+    public EvcDto.ScheduleOptimizationResponse optimizeSchedule(
+            @RequestBody(required = false) EvcDto.ScheduleOptimizationRequest request,
+            HttpServletRequest servletRequest
+    ) {
+        String correlationId = CorrelationFilter.id(servletRequest);
+        return schedulerService.optimizeAndSchedule(request, correlationId);
     }
 }

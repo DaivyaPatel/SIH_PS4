@@ -47,4 +47,52 @@ public final class EvcDto {
             List<ExpertEligibilityResult> ineligibleExperts
     ) {
     }
+
+    public record ScheduleOptimizationRequest(
+            List<UUID> caseIds,
+            java.time.LocalDate startDate,
+            java.time.LocalDate endDate,
+            Integer committeeSize,
+            Integer maxAssignmentsPerExpert
+    ) {
+    }
+
+    public record ScheduledCommitteeMember(
+            UUID expertId,
+            String name,
+            String domain,
+            String designation,
+            String affiliatedInstitution,
+            Region region,
+            String role
+    ) {
+    }
+
+    public record ScheduledVisitAssignment(
+            UUID caseId,
+            String applicationNumber,
+            String institutionName,
+            Region institutionRegion,
+            java.time.LocalDate scheduledInspectionDate,
+            List<ScheduledCommitteeMember> committeeMembers
+    ) {
+    }
+
+    public record UnassignedCaseReason(
+            UUID caseId,
+            String applicationNumber,
+            String reason
+    ) {
+    }
+
+    public record ScheduleOptimizationResponse(
+            String solverStatus,
+            long solveTimeMs,
+            int totalCasesRequested,
+            int totalCasesScheduled,
+            List<ScheduledVisitAssignment> scheduledVisits,
+            List<UnassignedCaseReason> unassignedCases,
+            String solverNotes
+    ) {
+    }
 }
