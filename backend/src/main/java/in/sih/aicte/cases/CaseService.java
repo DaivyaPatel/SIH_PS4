@@ -26,7 +26,11 @@ public class CaseService {
 
     public List<CaseDto.CaseSummary> listCases(CaseStatus statusFilter, Region regionFilter) {
         List<ApplicationCase> cases;
-        if (statusFilter != null) {
+        if (statusFilter != null && regionFilter != null) {
+            cases = caseRepository.findByStatusWithInstitution(statusFilter).stream()
+                    .filter(c -> c.getInstitution() != null && c.getInstitution().getRegion() == regionFilter)
+                    .toList();
+        } else if (statusFilter != null) {
             cases = caseRepository.findByStatusWithInstitution(statusFilter);
         } else if (regionFilter != null) {
             cases = caseRepository.findByRegionWithInstitution(regionFilter);

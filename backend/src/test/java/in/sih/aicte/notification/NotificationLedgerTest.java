@@ -146,4 +146,12 @@ class NotificationLedgerTest {
                 .andExpect(jsonPath("$.unread").value(org.hamcrest.Matchers.greaterThanOrEqualTo(1)))
                 .andExpect(jsonPath("$.deficiencyNotices").value(org.hamcrest.Matchers.greaterThanOrEqualTo(2)));
     }
+
+    @Test
+    void invalidTypeQueryParamReturns400Problem() throws Exception {
+        mvc.perform(get("/api/v1/notifications?type=INVALID_NOTIFICATION_TYPE"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.title").value("Invalid parameter"));
+    }
 }

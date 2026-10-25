@@ -155,4 +155,12 @@ class ExpertPoolTest {
         assertThat(eligibleList.get(0).get("name").asText()).isEqualTo("Prof. K. R. Ramanathan");
         assertThat(eligibleList.get(0).get("eligible").asBoolean()).isTrue();
     }
+
+    @Test
+    void invalidRegionQueryParamReturns400Problem() throws Exception {
+        mvc.perform(get("/api/v1/evc/experts?region=INVALID_REGION"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.title").value("Invalid parameter"));
+    }
 }

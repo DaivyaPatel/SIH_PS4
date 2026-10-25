@@ -77,6 +77,18 @@ class CaseControllerTest {
     }
 
     @Test
+    void filterByStatusAndRegionReturnsMatchingCases() throws Exception {
+        mvc.perform(get("/api/v1/cases?status=EVC_PENDING&region=WRO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].applicationNumber").value("APP-2026-WRO-001"));
+
+        mvc.perform(get("/api/v1/cases?status=EVC_PENDING&region=CRO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
     void getCaseByIdReturnsCompleteHierarchy() throws Exception {
         UUID apexId = UUID.fromString("33333333-3333-3333-3333-333333333001");
         mvc.perform(get("/api/v1/cases/" + apexId))
@@ -118,5 +130,18 @@ class CaseControllerTest {
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.title").value("Not found"))
                 .andExpect(jsonPath("$.correlationId").isString());
+    }
+
+    @Test
+    void invalidStatusOrRegionReturns400Problem() throws Exception {
+        mvc.perform(get("/api/v1/cases?status=NOT_A_STATUS"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.title").value("Invalid parameter"));
+
+        mvc.perform(get("/api/v1/cases?region=NOT_A_REGION"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.title").value("Invalid parameter"));
     }
 }
