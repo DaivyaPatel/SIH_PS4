@@ -26,7 +26,7 @@ public class ApplicationCase {
     @Column(name = "application_number", nullable = false, unique = true, length = 80)
     private String applicationNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "institution_id", nullable = false)
     private Institution institution;
 
