@@ -8,10 +8,54 @@
         "operationId": "getPlatformStatus",
         "responses": {"200": {"description": "Public service capabilities; no institution data", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/PlatformStatus"}}}}}
       }
+    },
+    "/api/v1/platform/modules": {
+      "get": {
+        "operationId": "listPlatformModules",
+        "parameters": [
+          {"name": "page", "in": "query", "schema": {"type": "integer", "minimum": 0, "maximum": 1000000, "default": 0}},
+          {"name": "size", "in": "query", "schema": {"type": "integer", "minimum": 1, "maximum": 100, "default": 20}}
+        ],
+        "responses": {
+          "200": {"description": "Stable, zero-based page of connection metadata", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ModulePage"}}}},
+          "400": {"description": "Invalid page parameters", "content": {"application/problem+json": {"schema": {"$ref": "#/components/schemas/ApiProblem"}}}}
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "ApiProblem": {
+        "type": "object",
+        "required": ["type", "title", "status", "detail", "instance", "correlationId", "errors"],
+        "properties": {
+          "type": {"type": "string"}, "title": {"type": "string"}, "status": {"type": "integer"},
+          "detail": {"type": "string"}, "instance": {"type": "string"},
+          "correlationId": {"type": "string", "format": "uuid"},
+          "errors": {"type": "array", "items": {"type": "object", "required": ["field", "message"], "properties": {"field": {"type": "string"}, "message": {"type": "string"}}}}
+        }
+      },
+      "CommandReceipt": {
+        "description": "Reserved for future commands after durable acceptance. ACCEPTED never means regulatory approval. No command endpoint is currently available.",
+        "type": "object",
+        "required": ["receiptId", "correlationId", "outcome", "recordedAt"],
+        "properties": {
+          "receiptId": {"type": "string", "format": "uuid"},
+          "correlationId": {"type": "string", "format": "uuid"},
+          "outcome": {"type": "string", "enum": ["ACCEPTED"]},
+          "recordedAt": {"type": "string", "format": "date-time"}
+        }
+      },
+      "ModulePage": {
+        "type": "object",
+        "required": ["items", "page", "size", "totalElements", "totalPages"],
+        "properties": {
+          "items": {"type": "array", "items": {"type": "object", "required": ["name", "integrated"], "properties": {"name": {"type": "string"}, "integrated": {"type": "boolean"}}}},
+          "page": {"type": "integer", "minimum": 0}, "size": {"type": "integer", "minimum": 1, "maximum": 100},
+          "totalElements": {"type": "integer", "format": "int64", "minimum": 0},
+          "totalPages": {"type": "integer", "format": "int64", "minimum": 0}
+        }
+      },
       "PlatformStatus": {
         "type": "object",
         "additionalProperties": false,

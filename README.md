@@ -45,6 +45,28 @@ npm test
 
 API types are generated from [the OpenAPI contract](./api/openapi.json). Commit regenerated types with contract changes. UI build output and dependencies remain ignored. Build the backend with the Maven commands below; the proof module retains its own disposable database tests.
 
+## API conventions and configuration
+
+- API paths use `/api/v1`. Only public platform metadata and health are permitted; all other operations are denied by the backend. Local login and external integrations are disabled.
+- `X-Correlation-ID` accepts a UUID. Missing or invalid values receive a new UUID. Responses echo the chosen value; errors include the same `correlationId`. Request logging context is cleared after processing.
+- Errors use `application/problem+json` with `type`, `title`, `status`, `detail`, `instance`, `correlationId` and `errors`. Validation entries contain field names and messages, never rejected values. Unexpected errors return a generic message.
+- `/api/v1/platform/modules` demonstrates zero-based `page` (0–1,000,000) and `size` (1–100, default 20), returning `items`, `page`, `size`, `totalElements` and `totalPages`. These are connection metadata, not application records.
+- The shared `CommandReceipt` schema reserves identifiers, outcome and UTC timestamp for future durably accepted commands. No command endpoint exists yet; `ACCEPTED` will never mean regulatory approval.
+- Runtime database settings are injected through `DATABASE_URL`, `DATABASE_USER` and `DATABASE_PASSWORD`. `APP_ENVIRONMENT` currently supports only `development`; unsupported environments fail validation. Test database configuration lives only in test code. Health details and other management endpoints remain private.
+
+## Continuous verification
+
+[Application checks](./.github/workflows/application.yml) run Java lint and real PostgreSQL/API tests, Flyway repeatability/checksum tests, generated API-type drift checks, TypeScript build/lint/tests, npm dependency audit, a resolved Java CycloneDX inventory scan and a redacted Gitleaks scan of the current tracked source. Dependency scans fail for high/critical findings and do not require API keys. Scanner availability failures fail the job.
+
+The Linux Compose job starts the actual pinned development services, checks API readiness and request conventions, performs an authenticated S3 object round-trip and rejects anonymous reads, reads OIDC discovery, captures a synthetic SMTP message, restarts the backend against the same database and verifies readiness fails during a database outage. CI creates temporary secrets and removes its disposable volumes. It does not deploy or publish images. These checks establish development behaviour, not production identity or evidence-security approval.
+
+To repeat the infrastructure smoke check with Compose running:
+
+```powershell
+python -m pip install -r scripts/ci-requirements.txt
+python scripts/smoke_dev.py
+```
+
 ## Stack
 
 | Component | Pinned version | Licence |
@@ -80,7 +102,7 @@ On Linux:
 ./mvnw --batch-mode --no-transfer-progress verify
 ```
 
-Surefire reports are written under `stack-proof/target/surefire-reports/`. Generated build output and database state must not be committed. A missing native runtime prerequisite is a failed setup/test, not a skipped passing test.
+Surefire reports are written under each module's `target/surefire-reports/`. Generated build output and database state must not be committed. A missing native runtime prerequisite is a failed setup/test, not a skipped passing test.
 
 ## What the Java tests check
 
@@ -94,7 +116,7 @@ Surefire reports are written under `stack-proof/target/surefire-reports/`. Gener
 
 Audit/outbox tables here store transactional proof intents only. This does not implement a production audit security model, delivery worker, regulatory authorisation or full EVC optimisation.
 
-Verified locally on Windows amd64 with JDK 21: all eight Java tests pass with no skips. The build workflow separately checks Windows and the Linux amd64 container; local Windows success alone does not establish container compatibility.
+Verified locally on Windows amd64 with JDK 21: eight proof tests and eleven backend tests pass with no skips. The build workflows separately check Windows and Linux containers; local Windows success alone does not establish container compatibility.
 
 ## Run the packaged native probe
 

@@ -21,6 +21,7 @@ __pycache__/
 *.log
 /.m2/
 /stack-proof/.embedded-postgres/
+/backend/.embedded-postgres/
 hs_err_pid*.log
 replay_pid*.log
 *.hprof
