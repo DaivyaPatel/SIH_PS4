@@ -1,6 +1,9 @@
 # Only build inputs enter the context; no secrets, caches or planning artefacts.
 *
 !pom.xml
+!backend/
+!backend/**
+backend/target/
 !stack-proof/
 !stack-proof/**
 stack-proof/target/

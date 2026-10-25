@@ -1,0 +1,91 @@
+name: Application foundation
+on: [push, pull_request]
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  service:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Lint, migrate, validate API and test with PostgreSQL
+        run: ./mvnw --batch-mode --no-transfer-progress -pl backend -am verify
+      - name: Generate resolved Java dependency inventory
+        run: ./mvnw --batch-mode --no-transfer-progress org.cyclonedx:cyclonedx-maven-plugin:2.9.1:makeAggregateBom -DoutputFormat=json
+      - name: Scan resolved Java dependencies
+        run: >-
+          docker run --rm -v "$PWD/target:/scan:ro" -v "$PWD/config/security:/security:ro" aquasec/trivy:0.76.1
+          sbom --exit-code 1 --severity HIGH,CRITICAL --show-suppressed
+          --vex /security/development-vex.json /scan/bom.json
+  ui:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --ignore-scripts
+      - run: npm run api:check
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+      - name: Scan UI dependencies
+        run: npm audit --audit-level=high
+  local-environment:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r scripts/ci-requirements.txt
+      - run: python -m unittest discover -s scripts -p 'test_*.py'
+      - run: python scripts/init_dev.py
+      - name: Validate Compose configuration without rendering secrets
+        run: docker compose config --quiet
+      - run: docker compose up --build -d
+      - run: python scripts/smoke_dev.py
+      - name: Restart service and verify persisted migration
+        run: |
+          docker compose restart backend
+          python scripts/smoke_dev.py
+      - name: Readiness fails during database outage
+        run: |
+          docker compose stop postgres
+          for attempt in $(seq 1 20); do
+            code=$(curl --silent --max-time 5 --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8080/actuator/health/readiness || true)
+            if [ "$code" = 503 ]; then exit 0; fi
+            sleep 2
+          done
+          exit 1
+      - name: Report failed service logs
+        if: failure()
+        run: docker compose logs --no-color --tail 100 backend storage identity mail
+      - name: Remove disposable CI environment
+        if: always()
+        run: docker compose down --volumes
+  secrets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan current tracked source for secrets
+        run: |
+          mkdir -p /tmp/aicte-reviewed-source
+          git archive HEAD | tar -x -C /tmp/aicte-reviewed-source
+          docker run --rm -v /tmp/aicte-reviewed-source:/scan:ro ghcr.io/gitleaks/gitleaks:v8.30.1 dir /scan --redact --no-banner

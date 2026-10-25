@@ -5,6 +5,7 @@ on:
     paths:
       - 'pom.xml'
       - 'stack-proof/**'
+      - 'backend/pom.xml'
       - '.mvn/**'
       - 'mvnw*'
       - 'Dockerfile'
@@ -14,6 +15,7 @@ on:
     paths:
       - 'pom.xml'
       - 'stack-proof/**'
+      - 'backend/pom.xml'
       - '.mvn/**'
       - 'mvnw*'
       - 'Dockerfile'

@@ -21,10 +21,18 @@ __pycache__/
 *.log
 /.m2/
 /stack-proof/.embedded-postgres/
+/backend/.embedded-postgres/
+# Keep downloaded scanner databases and local scan reports private.
+/.scanner-cache/
+/security-scan-results/
+/scripts/.coverage
 hs_err_pid*.log
 replay_pid*.log
 *.hprof
 *.jfr
+*.tsbuildinfo
+/frontend/playwright-report/
+/frontend/test-results/
 
 # Local runtime data and evidence (never commit institutional records)
 .local/

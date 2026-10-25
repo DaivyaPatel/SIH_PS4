@@ -21,10 +21,15 @@
     <embedded-postgres.version>2.2.2</embedded-postgres.version>
     <postgres-binaries.version>17.11.0</postgres-binaries.version>
     <maven-enforcer.version>3.6.2</maven-enforcer.version>
+    <!-- Security patches beyond the original Boot 3.5 dependency baseline. -->
+    <jackson-bom.version>2.21.7</jackson-bom.version>
+    <tomcat.version>10.1.61</tomcat.version>
+    <postgresql.version>42.7.12</postgresql.version>
     <project.build.outputTimestamp>2026-10-25T00:00:00Z</project.build.outputTimestamp>
   </properties>
   <modules>
     <module>stack-proof</module>
+    <module>backend</module>
   </modules>
   <dependencyManagement>
     <dependencies>

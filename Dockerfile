@@ -5,10 +5,11 @@ RUN useradd --create-home --uid 10001 proofbuilder
 WORKDIR /workspace
 COPY --chown=10001:10001 pom.xml ./
 COPY --chown=10001:10001 stack-proof ./stack-proof
+COPY --chown=10001:10001 backend/pom.xml ./backend/pom.xml
 RUN chown 10001:10001 /workspace
 USER 10001:10001
 # Embedded PostgreSQL intentionally runs as an unprivileged user.
-RUN mvn --batch-mode --no-transfer-progress verify
+RUN mvn --batch-mode --no-transfer-progress -pl stack-proof -am verify
 
 FROM eclipse-temurin:21-jre-noble
 RUN useradd --create-home --uid 10001 proof

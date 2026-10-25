@@ -1,0 +1,26 @@
+:root { font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #183638; background: #f6f7f3; font-synthesis: none; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+.development { background: #ede2ba; color: #4b3a0e; text-align: center; font-size: .75rem; letter-spacing: .07em; padding: 12px 18px; }
+header { max-width: 1160px; margin: auto; padding: 30px 36px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #d9dfd7; gap: 20px; }
+.brand { color: inherit; text-decoration: none; display: flex; align-items: center; gap: 12px; font-size: 1.6rem; font-weight: 800; }
+.brand span { font-size: .9rem; font-weight: 600; }
+.stage, footer { color: #536763; font-size: .8rem; }
+main { max-width: 960px; padding: 65px 36px 48px; margin: auto; }
+.eyebrow { font-size: .7rem; letter-spacing: .16em; font-weight: 700; color: #506b60; }
+h1 { font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.08; letter-spacing: -.045em; margin: 20px 0; font-weight: 600; }
+.intro { max-width: 610px; color: #52645e; line-height: 1.7; margin-bottom: 36px; }
+.panel { background: white; padding: 28px 32px; border: 1px solid #dbe1d8; border-radius: 12px; box-shadow: 0 8px 30px #1b403505; }
+h2 { font-size: 1.05rem; margin: 0; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.status { font-size: .7rem; background: #e6f1e9; color: #285a39; padding: 6px 10px; border-radius: 20px; }
+.panel p { color: #52645e; font-size: .9rem; line-height: 1.6; }
+dl { margin: 22px 0; }
+.service { display: flex; justify-content: space-between; gap: 15px; padding: 15px 0; border-bottom: 1px solid #e9ece7; font-size: .9rem; }
+dd { margin: 0; color: #68756f; text-align: right; }
+.note { margin-bottom: 0; }
+.safeguard { color: #61716a; font-size: .8rem; line-height: 1.6; margin-top: 25px; }
+button { background: #214e46; color: white; border: 0; padding: 11px 18px; border-radius: 6px; font: inherit; cursor: pointer; }
+button:focus-visible, a:focus-visible { outline: 3px solid #a6780a; outline-offset: 4px; }
+footer { max-width: 1160px; padding: 24px 36px; border-top: 1px solid #d9dfd7; margin: auto; }
+@media (max-width: 540px) { header { padding: 24px 20px; } .stage { display: none; } main { padding: 42px 20px; } .panel { padding: 24px 20px; } footer { padding: 24px 20px; } }
