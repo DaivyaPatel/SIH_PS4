@@ -15,10 +15,18 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ApiExceptionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(ApiExceptionHandler.class);
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    ResponseEntity<ApiProblem> typeMismatch(MethodArgumentTypeMismatchException exception, HttpServletRequest request) {
+        return problem(ApiProblem.of(request, 400, "Invalid parameter",
+                "Parameter '" + exception.getName() + "' has an invalid value.", List.of()));
+    }
 
     @ExceptionHandler(BindException.class)
     ResponseEntity<ApiProblem> validation(BindException exception, HttpServletRequest request) {
