@@ -19,6 +19,7 @@ class SecurityConfiguration {
         return http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.GET, "/api/v1/platform", "/api/v1/platform/modules",
                         "/actuator/health", "/actuator/health/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/cases", "/api/v1/cases/**").permitAll()
                 .anyRequest().denyAll())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(errors -> errors.authenticationEntryPoint((request, response, exception) -> {

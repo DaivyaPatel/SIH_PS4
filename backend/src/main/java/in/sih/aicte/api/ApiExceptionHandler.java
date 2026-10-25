@@ -33,6 +33,11 @@ public class ApiExceptionHandler {
         return problem(ApiProblem.of(request, 400, "Invalid request", "Request body is malformed or unsupported.", List.of()));
     }
 
+    @ExceptionHandler(java.util.NoSuchElementException.class)
+    ResponseEntity<ApiProblem> notFound(java.util.NoSuchElementException exception, HttpServletRequest request) {
+        return problem(ApiProblem.of(request, 404, "Not found", exception.getMessage(), List.of()));
+    }
+
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiProblem> unexpected(Exception exception, HttpServletRequest request) {
         if (exception instanceof ErrorResponse error) {
