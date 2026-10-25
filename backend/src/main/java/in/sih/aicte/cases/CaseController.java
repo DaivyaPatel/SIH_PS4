@@ -1,5 +1,7 @@
 package in.sih.aicte.cases;
 
+import in.sih.aicte.audit.AuditDto;
+import in.sih.aicte.audit.AuditService;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.MediaType;
@@ -14,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class CaseController {
 
     private final CaseService caseService;
+    private final AuditService auditService;
 
-    public CaseController(CaseService caseService) {
+    public CaseController(CaseService caseService, AuditService auditService) {
         this.caseService = caseService;
+        this.auditService = auditService;
     }
 
     @GetMapping
@@ -34,5 +38,10 @@ public class CaseController {
     @GetMapping("/by-number/{applicationNumber}")
     public CaseDto.CaseDetail getByNumber(@PathVariable String applicationNumber) {
         return caseService.getCaseByApplicationNumber(applicationNumber);
+    }
+
+    @GetMapping("/{id}/audit")
+    public List<AuditDto.AuditEventRecord> getAuditTrail(@PathVariable UUID id) {
+        return auditService.getAuditTrailForCase(id);
     }
 }
