@@ -1,5 +1,8 @@
 package in.sih.aicte.cases;
 
+import in.sih.aicte.calendar.CalendarDto;
+import in.sih.aicte.calendar.RegulatoryCalendarService;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -11,9 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class CaseService {
 
     private final ApplicationCaseRepository caseRepository;
+    private final RegulatoryCalendarService calendarService;
 
-    public CaseService(ApplicationCaseRepository caseRepository) {
+    public CaseService(
+            ApplicationCaseRepository caseRepository,
+            RegulatoryCalendarService calendarService
+    ) {
         this.caseRepository = caseRepository;
+        this.calendarService = calendarService;
     }
 
     public List<CaseDto.CaseSummary> listCases(CaseStatus statusFilter, Region regionFilter) {
@@ -42,6 +50,7 @@ public class CaseService {
 
     public CaseDto.CaseSummary toSummaryDto(ApplicationCase c) {
         Institution inst = c.getInstitution();
+        CalendarDto.DeadlineAnalysis deadline = calendarService.analyzeDeadline(c.getDeadlineAt(), Instant.now());
         return new CaseDto.CaseSummary(
                 c.getId(),
                 c.getApplicationNumber(),
@@ -57,7 +66,12 @@ public class CaseService {
                 c.getAssignedOfficer(),
                 c.getDeadlineAt(),
                 c.getSubmittedAt(),
-                c.getUpdatedAt()
+                c.getUpdatedAt(),
+                deadline.isOverdue(),
+                deadline.remainingHours(),
+                deadline.remainingBusinessDays(),
+                deadline.deadlineStatus(),
+                deadline.deadlineAtIst()
         );
     }
 
@@ -111,6 +125,7 @@ public class CaseService {
                         doc.getUploadedAt()))
                 .toList();
 
+        CalendarDto.DeadlineAnalysis deadline = calendarService.analyzeDeadline(c.getDeadlineAt(), Instant.now());
         return new CaseDto.CaseDetail(
                 c.getId(),
                 c.getApplicationNumber(),
@@ -123,6 +138,11 @@ public class CaseService {
                 c.getDeadlineAt(),
                 c.getSubmittedAt(),
                 c.getUpdatedAt(),
+                deadline.isOverdue(),
+                deadline.remainingHours(),
+                deadline.remainingBusinessDays(),
+                deadline.deadlineStatus(),
+                deadline.deadlineAtIst(),
                 instDetail,
                 defs,
                 docs

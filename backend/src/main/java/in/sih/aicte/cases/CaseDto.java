@@ -26,7 +26,12 @@ public final class CaseDto {
             String assignedOfficer,
             Instant deadlineAt,
             Instant submittedAt,
-            Instant updatedAt
+            Instant updatedAt,
+            boolean isOverdue,
+            long remainingHours,
+            int remainingBusinessDays,
+            String deadlineStatus,
+            String deadlineAtIst
     ) {
     }
 
@@ -91,6 +96,11 @@ public final class CaseDto {
             Instant deadlineAt,
             Instant submittedAt,
             Instant updatedAt,
+            boolean isOverdue,
+            long remainingHours,
+            int remainingBusinessDays,
+            String deadlineStatus,
+            String deadlineAtIst,
             InstitutionDetail institution,
             List<DeficiencyDetail> deficiencies,
             List<DocumentDetail> documents

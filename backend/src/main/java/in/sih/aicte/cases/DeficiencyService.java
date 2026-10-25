@@ -2,7 +2,7 @@ package in.sih.aicte.cases;
 
 import in.sih.aicte.audit.AuditDto;
 import in.sih.aicte.audit.AuditService;
-import java.time.Duration;
+import in.sih.aicte.calendar.RegulatoryCalendarService;
 import java.time.Instant;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -15,15 +15,18 @@ public class DeficiencyService {
     private final ApplicationCaseRepository caseRepository;
     private final DeficiencyRepository deficiencyRepository;
     private final AuditService auditService;
+    private final RegulatoryCalendarService calendarService;
 
     public DeficiencyService(
             ApplicationCaseRepository caseRepository,
             DeficiencyRepository deficiencyRepository,
-            AuditService auditService
+            AuditService auditService,
+            RegulatoryCalendarService calendarService
     ) {
         this.caseRepository = caseRepository;
         this.deficiencyRepository = deficiencyRepository;
         this.auditService = auditService;
+        this.calendarService = calendarService;
     }
 
     @Transactional
@@ -46,7 +49,7 @@ public class DeficiencyService {
         appCase.setReadinessScore(Math.max(10, Math.min(appCase.getReadinessScore(), 45)));
 
         int days = request.deadlineDays() > 0 ? request.deadlineDays() : 7;
-        Instant calculatedDeadline = Instant.now().plus(Duration.ofDays(days));
+        Instant calculatedDeadline = calendarService.calculateDeadline(Instant.now(), days);
         if (appCase.getDeadlineAt() == null || calculatedDeadline.isBefore(appCase.getDeadlineAt())) {
             appCase.setDeadlineAt(calculatedDeadline);
         }
