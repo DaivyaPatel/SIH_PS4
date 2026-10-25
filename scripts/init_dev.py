@@ -13,9 +13,12 @@ def initialize():
     if env.exists() or store.exists():
         raise SystemExit("Local configuration already exists; refusing to overwrite it.")
     store.parent.mkdir(parents=True, exist_ok=True)
+    if os.name != "nt":
+        store.parent.chmod(0o700)
     values = {name: secrets.token_hex(24) for name in (
         "POSTGRES_PASSWORD", "S3_ACCESS_KEY", "S3_SECRET_KEY", "KEYCLOAK_ADMIN_PASSWORD")}
-    with env.open("x", encoding="utf-8", newline="\n") as output:
+    descriptor = os.open(env, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as output:
         output.write("# Generated local-only development credentials\n")
         output.writelines(f"{key}={value}\n" for key, value in values.items())
     config = {"identities": [{"name": "local-development", "credentials": [{
@@ -26,7 +29,9 @@ def initialize():
         output.write("\n")
     if os.name != "nt":
         env.chmod(0o600)
-        store.chmod(0o600)
+        # The private host directory blocks other users; the read-only file mount
+        # must also be readable by the container's unprivileged service UID.
+        store.chmod(0o644)
     print("Created ignored local configuration. No credentials were printed.")
 
 

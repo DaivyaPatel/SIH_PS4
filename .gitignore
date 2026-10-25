@@ -25,6 +25,7 @@ __pycache__/
 # Keep downloaded scanner databases and local scan reports private.
 /.scanner-cache/
 /security-scan-results/
+/scripts/.coverage
 hs_err_pid*.log
 replay_pid*.log
 *.hprof

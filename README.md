@@ -22,7 +22,7 @@ npm run dev
 
 Open http://localhost:5173. The UI proxies API requests to the backend at http://127.0.0.1:8080. Platform metadata is at `/api/v1/platform`; readiness is at `/actuator/health/readiness`. A database failure makes readiness fail. The initial Flyway migration creates platform metadata only and refuses automatic baselining or database cleaning.
 
-The generator refuses to overwrite an existing `.env` or private storage configuration and never prints credentials. Keep both local. Do not substitute the committed example placeholders for generated credentials. Unix permissions restrict the generated files; on Windows they inherit the workspace ACL.
+The generator refuses to overwrite an existing `.env` or private storage configuration and never prints credentials. Keep both local. Do not substitute the committed example placeholders for generated credentials. On Unix, `.env` is mode 0600 and the storage configuration's parent directory is mode 0700. The storage file is readable through its read-only container mount by the unprivileged service UID; other host users cannot traverse its private directory. Windows files inherit the workspace ACL.
 
 | Local service | Address | Purpose |
 |---|---|---|
