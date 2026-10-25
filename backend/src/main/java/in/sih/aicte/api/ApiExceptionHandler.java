@@ -38,6 +38,11 @@ public class ApiExceptionHandler {
         return problem(ApiProblem.of(request, 404, "Not found", exception.getMessage(), List.of()));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    ResponseEntity<ApiProblem> illegalArgument(IllegalArgumentException exception, HttpServletRequest request) {
+        return problem(ApiProblem.of(request, 400, "Invalid transition", exception.getMessage(), List.of()));
+    }
+
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiProblem> unexpected(Exception exception, HttpServletRequest request) {
         if (exception instanceof ErrorResponse error) {

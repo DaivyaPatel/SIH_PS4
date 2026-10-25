@@ -204,12 +204,13 @@ class FoundationTest {
         var handlers = requestMappingHandlerMapping.getHandlerMethods().entrySet().stream()
                 .filter(entry -> entry.getValue().getBeanType().getPackageName().startsWith("in.sih.aicte"))
                 .filter(entry -> entry.getValue().getBeanType() != ProbeController.class).toList();
-        assertThat(handlers).hasSize(8);
+        assertThat(handlers).hasSize(9);
         for (var handler : handlers) {
             assertThat(handler.getValue().getBeanType()).hasAnnotation(RestController.class);
             assertThat(handler.getValue().getReturnType().getParameterType())
                     .isIn(PlatformController.Status.class, ApiPage.class, java.util.List.class,
                             in.sih.aicte.cases.CaseDto.CaseDetail.class,
+                            in.sih.aicte.workflow.WorkflowDto.TransitionResponse.class,
                             in.sih.aicte.integration.IntegrationDto.PortalSyncReceipt.class,
                             in.sih.aicte.integration.IntegrationDto.IntegrationStatus.class);
             assertThat(handler.getKey().getPatternValues()).allMatch(path -> !path.contains("*"));

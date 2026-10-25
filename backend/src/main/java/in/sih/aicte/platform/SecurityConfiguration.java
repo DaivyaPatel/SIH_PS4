@@ -20,7 +20,7 @@ class SecurityConfiguration {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.GET, "/api/v1/platform", "/api/v1/platform/modules",
                         "/actuator/health", "/actuator/health/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/cases", "/api/v1/cases/**").permitAll()
+                .requestMatchers("/api/v1/cases", "/api/v1/cases/**").permitAll()
                 .requestMatchers("/api/v1/integration", "/api/v1/integration/**").permitAll()
                 .anyRequest().denyAll())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
