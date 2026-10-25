@@ -204,7 +204,7 @@ class FoundationTest {
         var handlers = requestMappingHandlerMapping.getHandlerMethods().entrySet().stream()
                 .filter(entry -> entry.getValue().getBeanType().getPackageName().startsWith("in.sih.aicte"))
                 .filter(entry -> entry.getValue().getBeanType() != ProbeController.class).toList();
-        assertThat(handlers).hasSize(18);
+        assertThat(handlers).hasSize(23);
         for (var handler : handlers) {
             assertThat(handler.getValue().getBeanType()).hasAnnotation(RestController.class);
             assertThat(handler.getValue().getReturnType().getParameterType())
@@ -215,6 +215,9 @@ class FoundationTest {
                             in.sih.aicte.evc.EvcDto.ExpertDetail.class,
                             in.sih.aicte.evc.EvcDto.EligibleExpertsResponse.class,
                             in.sih.aicte.evc.EvcDto.ScheduleOptimizationResponse.class,
+                            in.sih.aicte.notification.NotificationDto.NotificationRecord.class,
+                            in.sih.aicte.notification.NotificationDto.EscalationScanResult.class,
+                            in.sih.aicte.notification.NotificationDto.NotificationSummary.class,
                             in.sih.aicte.workflow.WorkflowDto.TransitionResponse.class,
                             in.sih.aicte.integration.IntegrationDto.PortalSyncReceipt.class,
                             in.sih.aicte.integration.IntegrationDto.IntegrationStatus.class);

@@ -23,6 +23,7 @@ class SecurityConfiguration {
                 .requestMatchers("/api/v1/cases", "/api/v1/cases/**").permitAll()
                 .requestMatchers("/api/v1/integration", "/api/v1/integration/**").permitAll()
                 .requestMatchers("/api/v1/evc", "/api/v1/evc/**").permitAll()
+                .requestMatchers("/api/v1/notifications", "/api/v1/notifications/**").permitAll()
                 .anyRequest().denyAll())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling(errors -> errors.authenticationEntryPoint((request, response, exception) -> {
