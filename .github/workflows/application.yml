@@ -22,8 +22,9 @@ jobs:
         run: ./mvnw --batch-mode --no-transfer-progress org.cyclonedx:cyclonedx-maven-plugin:2.9.1:makeAggregateBom -DoutputFormat=json
       - name: Scan resolved Java dependencies
         run: >-
-          docker run --rm -v "$PWD/target:/scan:ro" aquasec/trivy:0.76.1
-          sbom --exit-code 1 --severity HIGH,CRITICAL /scan/bom.json
+          docker run --rm -v "$PWD/target:/scan:ro" -v "$PWD/config/security:/security:ro" aquasec/trivy:0.76.1
+          sbom --exit-code 1 --severity HIGH,CRITICAL --show-suppressed
+          --vex /security/development-vex.json /scan/bom.json
   ui:
     runs-on: ubuntu-24.04
     timeout-minutes: 10

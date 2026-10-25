@@ -22,6 +22,9 @@ __pycache__/
 /.m2/
 /stack-proof/.embedded-postgres/
 /backend/.embedded-postgres/
+# Keep downloaded scanner databases and local scan reports private.
+/.scanner-cache/
+/security-scan-results/
 hs_err_pid*.log
 replay_pid*.log
 *.hprof

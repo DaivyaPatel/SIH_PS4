@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariDataSource;
 import in.sih.aicte.api.CommandReceipt;
+import in.sih.aicte.api.ApiPage;
+import in.sih.aicte.platform.PlatformController;
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -29,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -40,6 +43,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.servlet.view.xslt.XsltView;
+import org.springframework.web.servlet.view.xslt.XsltViewResolver;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -51,6 +57,8 @@ class FoundationTest {
     @Autowired JdbcTemplate jdbc;
     @Autowired Flyway flyway;
     @Autowired HikariDataSource datasource;
+    @Autowired ApplicationContext context;
+    @Autowired RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     @TestConfiguration(proxyBeanMethods = false)
     static class TestInfrastructure {
@@ -187,5 +195,23 @@ class FoundationTest {
     void futureCommandReceiptPreservesIdentifiersAndUtcTimestamp() throws Exception {
         var receipt = new CommandReceipt(UUID.randomUUID(), UUID.randomUUID(), CommandReceipt.Outcome.ACCEPTED, Instant.now());
         assertThat(mapper.readValue(mapper.writeValueAsString(receipt), CommandReceipt.class)).isEqualTo(receipt);
+    }
+
+    @Test
+    void jsonOnlyRoutesKeepDevelopmentVexAssumptionsTrue() {
+        assertThat(context.getBeansOfType(XsltView.class)).isEmpty();
+        assertThat(context.getBeansOfType(XsltViewResolver.class)).isEmpty();
+        var handlers = requestMappingHandlerMapping.getHandlerMethods().entrySet().stream()
+                .filter(entry -> entry.getValue().getBeanType().getPackageName().startsWith("in.sih.aicte"))
+                .filter(entry -> entry.getValue().getBeanType() != ProbeController.class).toList();
+        assertThat(handlers).hasSize(2);
+        for (var handler : handlers) {
+            assertThat(handler.getValue().getBeanType()).hasAnnotation(RestController.class);
+            assertThat(handler.getValue().getReturnType().getParameterType())
+                    .isIn(PlatformController.Status.class, ApiPage.class);
+            assertThat(handler.getKey().getPatternValues()).allMatch(path -> !path.contains("*"));
+            assertThat(handler.getKey().getProducesCondition().getProducibleMediaTypes())
+                    .doesNotContain(MediaType.TEXT_EVENT_STREAM);
+        }
     }
 }

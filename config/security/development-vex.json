@@ -1,0 +1,23 @@
+{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "https://github.com/DaivyaPatel/SIH_PS4/security/development-json-api-2026-10-25",
+  "author": "SIH_PS4 development assessment",
+  "timestamp": "2026-10-25T00:00:00Z",
+  "version": 1,
+  "statements": [
+    {
+      "vulnerability": {"name": "CVE-2026-47884", "@id": "https://spring.io/security/cve-2026-47884/"},
+      "products": [{"@id": "pkg:maven/org.springframework/spring-webmvc@6.2.19"}],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_in_execute_path",
+      "impact_statement": "Applies only to this development service: all application mappings are explicitly enumerated JSON RestControllers; no wildcard view route, XsltView or XsltViewResolver is registered. FoundationTest.jsonOnlyRoutesKeepDevelopmentVexAssumptionsTrue enforces these assumptions. This is an applicability assessment, not a patched Spring artifact or production risk acceptance. Reassess before any controller/view change; a supported-framework migration is required before production. Primary advisory: https://spring.io/security/cve-2026-47884/"
+    },
+    {
+      "vulnerability": {"name": "CVE-2026-47890", "@id": "https://spring.io/security/cve-2026-47890/"},
+      "products": [{"@id": "pkg:maven/org.springframework/spring-webmvc@6.2.19"}],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_in_execute_path",
+      "impact_statement": "Applies only to this development service: no SSE, streamed view fragments, streaming responses or server-rendered views are used. Application controller return types are restricted to the two JSON metadata records by FoundationTest.jsonOnlyRoutesKeepDevelopmentVexAssumptionsTrue. Reassess before adding routes or streaming. This does not claim the underlying library is fixed. Primary advisory: https://spring.io/security/cve-2026-47890/"
+    }
+  ]
+}
