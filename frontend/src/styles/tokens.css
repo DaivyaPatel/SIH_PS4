@@ -1,0 +1,121 @@
+/* AICTE Approval Workflow - Visual Design Tokens */
+:root,
+[data-theme="light"] {
+  --bg-page: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --bg-hover: #e2e8f0;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-focus: #2563eb;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+
+  --accent: #1d4ed8;
+  --accent-hover: #1e40af;
+  --accent-subtle: #eff6ff;
+  --accent-border: #bfdbfe;
+
+  /* Status Tokens */
+  --status-ok-solid: #16a34a;
+  --status-ok-tint: #dcfce7;
+  --status-ok-text: #15803d;
+  --status-ok-border: #bbf7d0;
+
+  --status-warn-solid: #d97706;
+  --status-warn-tint: #fef3c7;
+  --status-warn-text: #b45309;
+  --status-warn-border: #fde68a;
+
+  --status-bad-solid: #dc2626;
+  --status-bad-tint: #fee2e2;
+  --status-bad-text: #b91c1c;
+  --status-bad-border: #fecaca;
+
+  --status-info-solid: #0284c7;
+  --status-info-tint: #e0f2fe;
+  --status-info-text: #0369a1;
+  --status-info-border: #bae6fd;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg-page: #0b0f19;
+  --bg-surface: #111827;
+  --bg-subtle: #1e293b;
+  --bg-hover: #334155;
+  --border: #1f2937;
+  --border-strong: #374151;
+  --border-focus: #3b82f6;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-inverse: #0f172a;
+
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-subtle: #1e3a8a33;
+  --accent-border: #1e40af;
+
+  /* Status Tokens */
+  --status-ok-solid: #22c55e;
+  --status-ok-tint: #14532d3d;
+  --status-ok-text: #4ade80;
+  --status-ok-border: #166534;
+
+  --status-warn-solid: #f59e0b;
+  --status-warn-tint: #78350f3d;
+  --status-warn-text: #fbbf24;
+  --status-warn-border: #92400e;
+
+  --status-bad-solid: #ef4444;
+  --status-bad-tint: #7f1d1d3d;
+  --status-bad-text: #f87171;
+  --status-bad-border: #991b1b;
+
+  --status-info-solid: #38bdf8;
+  --status-info-tint: #0c4a6e3d;
+  --status-info-text: #7dd3fc;
+  --status-info-border: #0369a1;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+
+  color-scheme: dark;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background-color: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tabular numerals for alignment */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Focus Outline */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
