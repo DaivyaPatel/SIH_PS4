@@ -140,27 +140,32 @@ export interface CaseDetail {
 }
 
 export interface ReadinessCriteria {
-  criteriaKey: string;
+  criteriaKey?: string;
+  category?: string;
   scorePercentage: number;
   maxPoints: number;
   earnedPoints: number;
-  status: 'PASSED' | 'WARNING' | 'FAILED';
+  status: 'PASSED' | 'WARNING' | 'FAILED' | string;
   details: string;
 }
 
 export interface BlockingPrerequisite {
-  code: string;
+  id?: string;
+  code?: string;
   category: string;
-  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM';
+  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | string;
   description: string;
-  remedyAction: string;
+  remedyAction?: string;
+  resolutionGuide?: string;
 }
 
 export interface RecoveryAction {
   priority: number;
-  actionCode: string;
+  actionCode?: string;
+  actionType?: string;
   description: string;
-  assignedRole: string;
+  assignedRole?: string;
+  targetRole?: string;
   targetEndpoint: string;
 }
 
@@ -173,46 +178,57 @@ export interface CaseReadinessResponse {
   readinessScore: number;
   readinessTier: 'FULLY_COMPLIANT' | 'NEAR_READY' | 'NEEDS_ATTENTION' | 'CRITICAL_DEFICIT';
   readyForNextStage: boolean;
-  nextRecommendedStage: string;
+  nextRecommendedStage?: string;
   criteria: ReadinessCriteria[];
   blockingPrerequisites: BlockingPrerequisite[];
   recommendedActions: RecoveryAction[];
-  evaluatedAt: string;
+  recommendedNextActions?: RecoveryAction[];
+  evaluatedAt?: string;
+  calculatedAt?: string;
 }
 
 export interface TimelineMilestone {
-  milestoneKey: string;
-  milestoneTitle: string;
-  status: 'COMPLETED' | 'IN_PROGRESS' | 'WARNING' | 'PENDING' | 'FAILED';
+  id?: string;
+  name?: string;
+  milestoneKey?: string;
+  milestoneTitle?: string;
+  status: 'COMPLETED' | 'IN_PROGRESS' | 'WARNING' | 'PENDING' | 'FAILED' | string;
   description: string;
   completedAt: string | null;
 }
 
 export interface TimelineEvent {
-  id: string;
+  id?: string;
+  eventId?: string;
   eventType: string;
   category: string;
   title: string;
-  description: string;
+  description?: string;
+  summary?: string;
   actorRole: string;
-  actorId: string;
+  actorId?: string;
+  actorName?: string;
   previousState: string | null;
   newState: string | null;
-  badgeColor: string;
-  iconName: string;
-  correlationId: string;
+  badgeColor?: string;
+  iconName?: string;
+  icon?: string;
+  correlationId?: string;
   timestamp: string;
-  formattedTimestamp: string;
-  timeAgo: string;
+  formattedTimestamp?: string;
+  formattedIstTime?: string;
+  timeAgo?: string;
 }
 
 export interface CaseTimelineResponse {
   caseId: string;
   applicationNumber: string;
   institutionName: string;
-  status: string;
+  currentStatus?: string;
+  status?: string;
   currentStage: string;
-  eventCount: number;
+  eventCount?: number;
+  totalEvents?: number;
   milestones: TimelineMilestone[];
   events: TimelineEvent[];
   generatedAt: string;
@@ -220,15 +236,21 @@ export interface CaseTimelineResponse {
 
 export interface AuditEventRecord {
   id: string;
-  caseId: string;
+  caseId?: string;
   action: string;
-  actorRole: string;
-  actorId: string;
-  previousState: string | null;
-  newState: string | null;
-  details: string;
-  correlationId: string;
-  createdAt: string;
+  actorRole?: string;
+  actorId?: string;
+  actor?: string;
+  role?: string;
+  previousState?: string | null;
+  newState?: string | null;
+  previousStatus?: string | null;
+  newStatus?: string | null;
+  details?: string;
+  rationale?: string;
+  correlationId?: string;
+  createdAt?: string;
+  timestamp?: string;
 }
 
 export interface ExpertDetail {

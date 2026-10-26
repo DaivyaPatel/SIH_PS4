@@ -3,14 +3,24 @@ import { AlertCircle, CheckCircle, Info, X } from 'lucide-react';
 
 export interface ToastItem {
   id: string;
-  type: 'success' | 'error' | 'info' | 'warn';
+  type: 'success' | 'error' | 'info' | 'warn' | 'warning';
+  title?: string;
   message: string;
   referenceId?: string;
 }
 
+export type ToastInput =
+  | string
+  | {
+      message: string;
+      title?: string;
+      type?: 'success' | 'error' | 'info' | 'warn' | 'warning';
+      referenceId?: string;
+    };
+
 interface ToastContextType {
   toasts: ToastItem[];
-  addToast: (message: string, type?: ToastItem['type'], referenceId?: string) => void;
+  addToast: (input: ToastInput, type?: ToastItem['type'], referenceId?: string) => void;
   removeToast: (id: string) => void;
 }
 
@@ -19,13 +29,31 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
 
-  const addToast = (message: string, type: ToastItem['type'] = 'info', referenceId?: string) => {
+  const addToast = (input: ToastInput, type: ToastItem['type'] = 'info', referenceId?: string) => {
     const id = Math.random().toString(36).substring(2, 9);
-    const newToast: ToastItem = { id, type, message, referenceId };
+    let newToast: ToastItem;
+
+    if (typeof input === 'object' && input !== null) {
+      newToast = {
+        id,
+        type: input.type === 'warning' ? 'warn' : input.type || 'info',
+        title: input.title,
+        message: input.message,
+        referenceId: input.referenceId,
+      };
+    } else {
+      newToast = {
+        id,
+        type: type === 'warning' ? 'warn' : type,
+        message: input,
+        referenceId,
+      };
+    }
+
     setToasts(prev => [...prev, newToast]);
 
     // Errors persist until dismissed; others auto-dismiss in 5s
-    if (type !== 'error') {
+    if (newToast.type !== 'error') {
       setTimeout(() => {
         removeToast(id);
       }, 5000);

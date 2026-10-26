@@ -5,11 +5,16 @@ import { getStoredItem, setStoredItem } from '../lib/storage';
 interface Permissions {
   canApprove: boolean;
   canReject: boolean;
+  canRejectApplications: boolean;
   canFlagDeficiency: boolean;
+  canFlagDeficiencies: boolean;
   canResolveDeficiency: boolean;
+  canResolveDeficiencies: boolean;
   canRespondDeficiency: boolean;
   canScheduleEVC: boolean;
   canExtendDeadline: boolean;
+  canExtendDeadlines: boolean;
+  canPerformScrutiny: boolean;
   canViewAudit: boolean;
   roleDisplayName: string;
 }
@@ -36,14 +41,21 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     setStoredItem('aicte_role', newRole);
   };
 
+  const isOfficer = role === 'REGIONAL_OFFICER' || role === 'SCRUTINY_OFFICER';
+
   const permissions: Permissions = {
     canApprove: role === 'REGIONAL_OFFICER',
     canReject: role === 'REGIONAL_OFFICER',
-    canFlagDeficiency: role === 'SCRUTINY_OFFICER' || role === 'REGIONAL_OFFICER',
-    canResolveDeficiency: role === 'SCRUTINY_OFFICER' || role === 'REGIONAL_OFFICER',
+    canRejectApplications: role === 'REGIONAL_OFFICER',
+    canFlagDeficiency: isOfficer,
+    canFlagDeficiencies: isOfficer,
+    canResolveDeficiency: isOfficer,
+    canResolveDeficiencies: isOfficer,
     canRespondDeficiency: role === 'INSTITUTION_ADMIN',
     canScheduleEVC: role === 'REGIONAL_OFFICER',
     canExtendDeadline: role === 'REGIONAL_OFFICER',
+    canExtendDeadlines: role === 'REGIONAL_OFFICER',
+    canPerformScrutiny: isOfficer,
     canViewAudit: true,
     roleDisplayName:
       role === 'REGIONAL_OFFICER'

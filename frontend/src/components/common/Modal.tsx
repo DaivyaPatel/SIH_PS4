@@ -8,9 +8,11 @@ interface ModalProps {
   subtitle?: string;
   children: ReactNode;
   maxWidth?: number;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export function Modal({ isOpen, onClose, title, subtitle, children, maxWidth = 520 }: ModalProps) {
+export function Modal({ isOpen, onClose, title, subtitle, children, maxWidth, size = 'md' }: ModalProps) {
+  const effectiveMaxWidth = maxWidth || (size === 'sm' ? 420 : size === 'lg' ? 680 : 520);
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -58,7 +60,7 @@ export function Modal({ isOpen, onClose, title, subtitle, children, maxWidth = 5
         style={{
           position: 'relative',
           width: '100%',
-          maxWidth,
+          maxWidth: effectiveMaxWidth,
           background: 'var(--bg-surface)',
           border: '1px solid var(--border)',
           borderRadius: 8,

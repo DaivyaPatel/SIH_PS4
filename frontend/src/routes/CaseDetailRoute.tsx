@@ -1,13 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 import { getCaseById, getCaseReadiness } from '../lib/api';
-import { StatusChip } from '../components/common/StatusChip';
-import { DeadlineChip } from '../components/common/DeadlineChip';
-import { ReadinessRing } from '../components/common/ReadinessRing';
 import { Skeleton } from '../components/common/Skeleton';
-import { Button } from '../components/common/Button';
-import type { CaseDetail, CaseReadinessResponse } from '../types/domain';
+import { CaseDetailHeader } from '../components/cases/CaseDetailHeader';
+import { CaseDetailTabs } from '../components/cases/CaseDetailTabs';
+import { CaseRightRail } from '../components/cases/CaseRightRail';
+import { ExtendDeadlineModal } from '../components/cases/ExtendDeadlineModal';
+import { FlagDeficiencyModal } from '../components/cases/FlagDeficiencyModal';
+import { RespondDeficiencyModal } from '../components/cases/RespondDeficiencyModal';
+import { ResolveDeficiencyModal } from '../components/cases/ResolveDeficiencyModal';
+import { DocumentPreviewDrawer } from '../components/cases/DocumentPreviewDrawer';
+import type { CaseDetail, CaseReadinessResponse, DocumentDetail, DeficiencyDetail } from '../types/domain';
 
 export function CaseDetailRoute() {
   const { id } = useParams<{ id: string }>();
@@ -18,7 +21,18 @@ export function CaseDetailRoute() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  // Tab State: 0=Overview, 1=Deficiencies, 2=Documents, 3=Timeline, 4=Audit
+  const [activeTab, setActiveTab] = useState(0);
+
+  // Modals & Drawers State
+  const [extendModalOpen, setExtendModalOpen] = useState(false);
+  const [flagModalOpen, setFlagModalOpen] = useState(false);
+  const [selectedDoc, setSelectedDoc] = useState<DocumentDetail | null>(null);
+  const [docDrawerOpen, setDocDrawerOpen] = useState(false);
+  const [respondDef, setRespondDef] = useState<DeficiencyDetail | null>(null);
+  const [resolveDef, setResolveDef] = useState<DeficiencyDetail | null>(null);
+
+  const loadCaseData = useCallback(() => {
     if (!id) return;
     setLoading(true);
     setError(null);
@@ -30,212 +44,166 @@ export function CaseDetailRoute() {
         setLoading(false);
       })
       .catch((err: Error) => {
-        setError(err.message || 'Unable to load case details.');
+        setError(err.message || 'Unable to retrieve case dossier.');
         setLoading(false);
       });
   }, [id]);
 
+  useEffect(() => {
+    loadCaseData();
+  }, [loadCaseData]);
+
   if (loading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <Skeleton height={32} width="40%" />
-        <Skeleton height={120} />
+        <Skeleton height={140} />
+        <div style={{ display: 'flex', gap: 20 }}>
+          <div style={{ flex: 1 }}>
+            <Skeleton height={400} />
+          </div>
+          <div style={{ width: 320 }}>
+            <Skeleton height={400} />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error || !caseData) {
     return (
-      <div style={{ padding: 20, background: 'var(--status-bad-tint)', color: 'var(--status-bad-text)', borderRadius: 8 }}>
-        <strong>Error:</strong> {error || 'Case not found'}
-        <div style={{ marginTop: 12 }}>
-          <Button variant="secondary" size="sm" onClick={() => navigate('/cases')}>
-            Back to Cases
-          </Button>
-        </div>
+      <div
+        role="alert"
+        style={{
+          padding: 24,
+          background: 'var(--status-bad-tint)',
+          color: 'var(--status-bad-text)',
+          border: '1px solid var(--status-bad-border)',
+          borderRadius: 8,
+          maxWidth: 600,
+          margin: '40px auto',
+          textAlign: 'center',
+        }}
+      >
+        <h2 style={{ fontSize: 18, margin: '0 0 8px' }}>Failed to Load Application</h2>
+        <p style={{ margin: '0 0 16px', fontSize: 13 }}>{error || 'Application dossier not found.'}</p>
+        <button
+          onClick={() => navigate('/cases')}
+          style={{
+            padding: '8px 16px',
+            background: 'var(--accent)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 6,
+            cursor: 'pointer',
+            fontSize: 13,
+            fontWeight: 600,
+          }}
+        >
+          Return to Cases
+        </button>
       </div>
     );
   }
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
-        <Button
-          variant="ghost"
-          size="sm"
-          leftIcon={<ArrowLeft size={14} />}
-          onClick={() => navigate('/cases')}
-          style={{ paddingLeft: 0 }}
-        >
-          Back to Cases
-        </Button>
-      </div>
+      {/* Case Detail Header (with 5-Stage Stepper and Guarded Action Button) */}
+      <CaseDetailHeader
+        caseData={caseData}
+        readiness={readiness}
+        onOpenExtendDeadline={() => setExtendModalOpen(true)}
+        onRefresh={loadCaseData}
+        onTabJump={tabIdx => setActiveTab(tabIdx)}
+      />
 
-      {/* Header Block */}
+      {/* Main Content Layout: Main Tabs + Right Rail */}
       <div
         style={{
-          background: 'var(--bg-surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 8,
-          padding: 24,
-          marginBottom: 24,
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          flexWrap: 'wrap',
           gap: 20,
+          alignItems: 'flex-start',
+          flexDirection: 'row',
         }}
       >
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-            <span style={{ fontSize: 13, fontFamily: 'monospace', color: 'var(--text-muted)' }}>
-              {caseData.applicationNumber}
-            </span>
-            <StatusChip status={caseData.status} />
-            <DeadlineChip
-              isOverdue={caseData.isOverdue}
-              remainingHours={caseData.remainingHours}
-              remainingBusinessDays={caseData.remainingBusinessDays}
-              deadlineStatus={caseData.deadlineStatus}
-              deadlineAtIst={caseData.deadlineAtIst}
-            />
-          </div>
-          <h1 style={{ margin: '0 0 6px', fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>
-            {caseData.institution.name}
-          </h1>
-          <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)' }}>
-            Region: <strong>{caseData.institution.region}</strong> · Type: {caseData.applicationType} · AY: {caseData.academicYear}
-          </p>
-        </div>
+        {/* Left Column: Interactive Tabs */}
+        <CaseDetailTabs
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          caseData={caseData}
+          onSelectDocument={doc => {
+            setSelectedDoc(doc);
+            setDocDrawerOpen(true);
+          }}
+          onOpenFlagDeficiency={() => setFlagModalOpen(true)}
+          onOpenRespondDeficiency={def => setRespondDef(def)}
+          onOpenResolveDeficiency={def => setResolveDef(def)}
+        />
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <ReadinessRing score={caseData.readinessScore} size="lg" />
-        </div>
+        {/* Right Column: 320px Sticky Right Rail */}
+        <CaseRightRail
+          readiness={readiness}
+          onTabJump={setActiveTab}
+          onOpenFlagDeficiency={() => setFlagModalOpen(true)}
+          onOpenExtendDeadline={() => setExtendModalOpen(true)}
+        />
       </div>
 
-      {/* Layout Grid: Details & Readiness Rail */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 24 }}>
-        {/* Main Details Panel */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 20 }}>
-            <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 600 }}>Campus Information</h3>
-            {caseData.institution.campuses.map(camp => (
-              <div key={camp.id} style={{ fontSize: 13, display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
-                <div>
-                  <span style={{ color: 'var(--text-muted)' }}>Campus Name:</span>
-                  <div>{camp.campusName}</div>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)' }}>Address:</span>
-                  <div>{camp.address}</div>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)' }}>Land Area:</span>
-                  <div>{camp.landAreaAcres} Acres</div>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)' }}>Built-up Area:</span>
-                  <div>{camp.builtUpAreaSqM} sq.m</div>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-muted)' }}>Land Lease Status:</span>
-                  <div>{camp.landLeaseStatus}</div>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Extend Deadline Modal */}
+      <ExtendDeadlineModal
+        isOpen={extendModalOpen}
+        onClose={() => setExtendModalOpen(false)}
+        caseId={caseData.id}
+        applicationNumber={caseData.applicationNumber}
+        currentDeadlineAtIst={caseData.deadlineAtIst}
+        onSuccess={loadCaseData}
+      />
 
-          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 20 }}>
-            <h3 style={{ margin: '0 0 14px', fontSize: 15, fontWeight: 600 }}>
-              Flagged Deficiencies ({caseData.deficiencies.length})
-            </h3>
-            {caseData.deficiencies.length === 0 ? (
-              <p style={{ margin: 0, fontSize: 13, color: 'var(--status-ok-text)' }}>
-                ✓ Zero deficiencies flagged on this application case. Clean regulatory standing.
-              </p>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {caseData.deficiencies.map(def => (
-                  <div
-                    key={def.id}
-                    style={{
-                      padding: 12,
-                      background: 'var(--bg-subtle)',
-                      borderRadius: 6,
-                      fontSize: 13,
-                      borderLeft: `3px solid ${def.status === 'RESOLVED' ? 'var(--status-ok-solid)' : 'var(--status-bad-solid)'}`,
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                      <strong>{def.category}</strong>
-                      <span style={{ fontSize: 11, fontWeight: 600 }}>{def.status}</span>
-                    </div>
-                    <div style={{ color: 'var(--text-secondary)' }}>{def.description}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+      {/* Flag Deficiency Modal */}
+      <FlagDeficiencyModal
+        isOpen={flagModalOpen}
+        onClose={() => setFlagModalOpen(false)}
+        caseId={caseData.id}
+        applicationNumber={caseData.applicationNumber}
+        onSuccess={loadCaseData}
+      />
 
-        {/* Right Rail: Readiness Evaluation */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {readiness && (
-            <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 20 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>Readiness Breakdown</h4>
-                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent)' }}>{readiness.readinessTier}</span>
-              </div>
+      {/* Respond Deficiency Modal */}
+      {respondDef && (
+        <RespondDeficiencyModal
+          isOpen={Boolean(respondDef)}
+          onClose={() => setRespondDef(null)}
+          caseId={caseData.id}
+          deficiencyId={respondDef.id}
+          deficiencyDescription={respondDef.description}
+          onSuccess={loadCaseData}
+        />
+      )}
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {readiness.criteria.map(crit => (
-                  <div key={crit.criteriaKey}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>{crit.criteriaKey.replace(/_/g, ' ')}</span>
-                      <span className="tabular-nums" style={{ fontWeight: 600 }}>
-                        {crit.earnedPoints} / {crit.maxPoints} pts
-                      </span>
-                    </div>
-                    <div style={{ height: 6, background: 'var(--bg-subtle)', borderRadius: 3, overflow: 'hidden' }}>
-                      <div
-                        style={{
-                          height: '100%',
-                          width: `${crit.scorePercentage}%`,
-                          background: crit.status === 'PASSED' ? 'var(--status-ok-solid)' : 'var(--status-warn-solid)',
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+      {/* Resolve Deficiency Modal */}
+      {resolveDef && (
+        <ResolveDeficiencyModal
+          isOpen={Boolean(resolveDef)}
+          onClose={() => setResolveDef(null)}
+          caseId={caseData.id}
+          deficiencyId={resolveDef.id}
+          deficiencyDescription={resolveDef.description}
+          proofDocumentName={resolveDef.proofDocumentName}
+          onSuccess={loadCaseData}
+        />
+      )}
 
-              {readiness.blockingPrerequisites.length > 0 && (
-                <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
-                  <h5 style={{ margin: '0 0 8px', fontSize: 12, fontWeight: 700, color: 'var(--status-bad-text)' }}>
-                    Blocking Prerequisites ({readiness.blockingPrerequisites.length})
-                  </h5>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {readiness.blockingPrerequisites.map(block => (
-                      <div
-                        key={block.code}
-                        style={{
-                          fontSize: 11,
-                          padding: 8,
-                          background: 'var(--status-bad-tint)',
-                          color: 'var(--status-bad-text)',
-                          borderRadius: 6,
-                        }}
-                      >
-                        <div>{block.description}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Document Preview Drawer */}
+      <DocumentPreviewDrawer
+        isOpen={docDrawerOpen}
+        onClose={() => {
+          setDocDrawerOpen(false);
+          setSelectedDoc(null);
+        }}
+        document={selectedDoc}
+        onFlagAsDeficient={() => {
+          setFlagModalOpen(true);
+        }}
+      />
     </div>
   );
 }

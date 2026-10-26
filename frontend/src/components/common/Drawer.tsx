@@ -8,9 +8,11 @@ interface DrawerProps {
   subtitle?: string;
   children: ReactNode;
   width?: number;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export function Drawer({ isOpen, onClose, title, subtitle, children, width = 440 }: DrawerProps) {
+export function Drawer({ isOpen, onClose, title, subtitle, children, width, size = 'md' }: DrawerProps) {
+  const effectiveWidth = width || (size === 'sm' ? 360 : size === 'lg' ? 580 : 440);
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -56,7 +58,7 @@ export function Drawer({ isOpen, onClose, title, subtitle, children, width = 440
         style={{
           position: 'relative',
           width: '100%',
-          maxWidth: width,
+          maxWidth: effectiveWidth,
           height: '100%',
           background: 'var(--bg-surface)',
           borderLeft: '1px solid var(--border)',
