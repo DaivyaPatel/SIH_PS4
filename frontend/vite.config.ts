@@ -1,9 +1,19 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
+import { demoMiddleware } from './src/mock/demoMiddleware';
+
+function demoApiPlugin(): Plugin {
+  return {
+    name: 'demo-api-server',
+    configureServer(server) {
+      server.middlewares.use(demoMiddleware());
+    },
+  };
+}
 
 export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
-    proxy: { '/api': 'http://127.0.0.1:8080' },
   },
+  plugins: [demoApiPlugin()],
 });
