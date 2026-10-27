@@ -1,48 +1,60 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  ArrowRight,
-  ShieldCheck,
-} from 'lucide-react';
-import { getDashboardSummary } from '../lib/api';
+import { ArrowRight, RefreshCw } from 'lucide-react';
+import { getDashboardSummary, getCases } from '../lib/api';
 import { useRegion } from '../context/RegionContext';
 import { useRole } from '../context/RoleContext';
 import { Skeleton } from '../components/common/Skeleton';
 import { Button } from '../components/common/Button';
-import type { DashboardSummary } from '../types/domain';
+import { ExecutiveKpiStrip } from '../components/dashboard/ExecutiveKpiStrip';
+import { PipelineFunnelChart } from '../components/dashboard/PipelineFunnelChart';
+import { RegulatoryClockBar } from '../components/dashboard/RegulatoryClockBar';
+import { NeedsAttentionQueue } from '../components/dashboard/NeedsAttentionQueue';
+import { InstitutionDashboardCard } from '../components/dashboard/InstitutionDashboardCard';
+import { ExpertVisitsCard } from '../components/dashboard/ExpertVisitsCard';
+import type { DashboardSummary, CaseSummary } from '../types/domain';
 
 export function HomeRoute() {
   const { selectedRegion } = useRegion();
-  const { permissions } = useRole();
+  const { role, permissions } = useRole();
   const navigate = useNavigate();
 
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [cases, setCases] = useState<CaseSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadDashboardData = () => {
     setLoading(true);
     setError(null);
-    getDashboardSummary(selectedRegion)
-      .then(data => {
-        setSummary(data);
+
+    Promise.all([
+      getDashboardSummary(selectedRegion),
+      getCases('ALL', selectedRegion),
+    ])
+      .then(([summaryData, caseData]) => {
+        setSummary(summaryData);
+        setCases(caseData);
         setLoading(false);
       })
       .catch((err: Error) => {
-        setError(err.message || 'Unable to load dashboard metrics.');
+        setError(err.message || 'Unable to retrieve dashboard metrics.');
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    loadDashboardData();
   }, [selectedRegion]);
 
   return (
-    <div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* Header Banner */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          marginBottom: 24,
           flexWrap: 'wrap',
           gap: 16,
         }}
@@ -50,11 +62,11 @@ export function HomeRoute() {
         <div>
           <h1
             style={{
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: 700,
               color: 'var(--text-primary)',
-              margin: '0 0 6px',
-              letterSpacing: '-0.02em',
+              margin: '0 0 4px',
+              letterSpacing: '-0.01em',
             }}
           >
             Approval Coordination Dashboard
@@ -65,183 +77,109 @@ export function HomeRoute() {
           </p>
         </div>
 
-        <Button variant="primary" onClick={() => navigate('/cases')} rightIcon={<ArrowRight size={14} />}>
-          View Active Cases
-        </Button>
-      </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={loadDashboardData}
+            leftIcon={<RefreshCw size={13} />}
+          >
+            Refresh
+          </Button>
 
-      {/* Loading Skeleton */}
-      {loading && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} style={{ padding: 16, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8 }}>
-              <Skeleton height={14} width="60%" />
-              <div style={{ height: 8 }} />
-              <Skeleton height={28} width="40%" />
-            </div>
-          ))}
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => navigate('/cases')}
+            rightIcon={<ArrowRight size={13} />}
+          >
+            Explore Cases Directory
+          </Button>
         </div>
-      )}
+      </div>
 
       {/* Error state */}
       {error && (
         <div
           role="alert"
           style={{
-            padding: 16,
+            padding: 14,
             background: 'var(--status-bad-tint)',
             color: 'var(--status-bad-text)',
             border: '1px solid var(--status-bad-border)',
             borderRadius: 8,
-            marginBottom: 20,
+            fontSize: 13,
           }}
         >
-          <strong>Error loading metrics:</strong> {error}
+          <strong>Error loading dashboard:</strong> {error}
         </div>
       )}
 
-      {/* Summary Cards */}
+      {/* Loading Skeletons */}
+      {loading && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} style={{ padding: 16, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8 }}>
+                <Skeleton height={14} width="60%" />
+                <div style={{ height: 8 }} />
+                <Skeleton height={28} width="40%" />
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 16 }}>
+            <Skeleton height={260} />
+            <Skeleton height={260} />
+          </div>
+          <Skeleton height={320} />
+        </div>
+      )}
+
+      {/* Loaded Dashboard Content */}
       {!loading && summary && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-          {/* Top KPI Cards Row */}
+        <>
+          {/* Role Variant 1: Institution Admin View */}
+          {role === 'INSTITUTION_ADMIN' && (
+            <InstitutionDashboardCard primaryCase={cases[0] || null} />
+          )}
+
+          {/* Role Variant 2: EVC Expert View */}
+          {role === 'EVC_EXPERT' && (
+            <ExpertVisitsCard
+              evcCases={cases.filter(
+                c => c.status === 'EVC_PENDING' || c.status === 'EVC_SCHEDULED' || c.status === 'EVC_COMPLETED'
+              )}
+            />
+          )}
+
+          {/* Executive KPI Strip (Shown for Officers and as summary for Institution) */}
+          {role !== 'EVC_EXPERT' && (
+            <ExecutiveKpiStrip summary={summary} role={role} />
+          )}
+
+          {/* Role Variant 3: Regional Officer Escalations Top Priority */}
+          {role === 'REGIONAL_OFFICER' && (
+            <NeedsAttentionQueue cases={cases} role={role} />
+          )}
+
+          {/* Two-Panel Row: Pipeline Funnel + Regulatory Clock Health */}
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: 14,
+              gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
+              gap: 16,
+              alignItems: 'stretch',
             }}
           >
-            <div
-              onClick={() => navigate('/cases')}
-              style={{
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 8,
-                padding: '16px 20px',
-                cursor: 'pointer',
-                boxShadow: 'var(--shadow-sm)',
-              }}
-            >
-              <div style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 500 }}>Total Colleges</div>
-              <div className="tabular-nums" style={{ fontSize: 26, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>
-                {summary.kpiCards.totalColleges}
-              </div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Across monitored jurisdictions</div>
-            </div>
-
-            <div
-              onClick={() => navigate('/cases?status=UNDER_SCRUTINY')}
-              style={{
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 8,
-                padding: '16px 20px',
-                cursor: 'pointer',
-                boxShadow: 'var(--shadow-sm)',
-              }}
-            >
-              <div style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 500 }}>Pending Scrutiny</div>
-              <div className="tabular-nums" style={{ fontSize: 26, fontWeight: 700, color: 'var(--accent)', marginTop: 4 }}>
-                {summary.kpiCards.pendingScrutiny}
-              </div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Awaiting document verification</div>
-            </div>
-
-            <div
-              onClick={() => navigate('/deficiencies')}
-              style={{
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 8,
-                padding: '16px 20px',
-                cursor: 'pointer',
-                boxShadow: 'var(--shadow-sm)',
-              }}
-            >
-              <div style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 500 }}>Open Deficiencies</div>
-              <div
-                className="tabular-nums"
-                style={{
-                  fontSize: 26,
-                  fontWeight: 700,
-                  color: summary.kpiCards.openDeficiencies > 0 ? 'var(--status-bad-text)' : 'var(--status-ok-text)',
-                  marginTop: 4,
-                }}
-              >
-                {summary.kpiCards.openDeficiencies}
-              </div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Active institutional cure tasks</div>
-            </div>
-
-            <div
-              onClick={() => navigate('/visits')}
-              style={{
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 8,
-                padding: '16px 20px',
-                cursor: 'pointer',
-                boxShadow: 'var(--shadow-sm)',
-              }}
-            >
-              <div style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 500 }}>Scheduled EVC Visits</div>
-              <div className="tabular-nums" style={{ fontSize: 26, fontWeight: 700, color: 'var(--status-ok-text)', marginTop: 4 }}>
-                {summary.kpiCards.scheduledInspections}
-              </div>
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Committees locked via CP-SAT</div>
-            </div>
+            <PipelineFunnelChart summary={summary} />
+            <RegulatoryClockBar summary={summary} />
           </div>
 
-          {/* Quick Guidance Card */}
-          <div
-            style={{
-              background: 'var(--bg-surface)',
-              border: '1px solid var(--border)',
-              borderRadius: 8,
-              padding: 20,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 20,
-              flexWrap: 'wrap',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 8,
-                  background: 'var(--accent-subtle)',
-                  color: 'var(--accent)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <ShieldCheck size={22} />
-              </div>
-              <div>
-                <h3 style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>
-                  Phase 0 Shell Initialized
-                </h3>
-                <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)' }}>
-                  All 12 backend services are live and connected. Switch roles or regions in the header to explore contextual behaviors.
-                </p>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: 10 }}>
-              <Button variant="secondary" onClick={() => navigate('/cases')}>
-                Inspect Cases
-              </Button>
-              <Button variant="secondary" onClick={() => navigate('/visits')}>
-                EVC Scheduling
-              </Button>
-            </div>
-          </div>
-        </div>
+          {/* Scrutiny Officer and Standard Role Priority Queue */}
+          {role !== 'REGIONAL_OFFICER' && role !== 'INSTITUTION_ADMIN' && (
+            <NeedsAttentionQueue cases={cases} role={role} />
+          )}
+        </>
       )}
     </div>
   );
