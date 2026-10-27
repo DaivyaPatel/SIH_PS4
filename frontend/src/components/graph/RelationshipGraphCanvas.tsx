@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import {
   Search,
   ListTree,
@@ -215,14 +215,6 @@ export function RelationshipGraphCanvas({
     setSelectedNode(null);
     setHoveredNode(null);
   };
-
-  // Auto-select first application node on initial load if none selected
-  useEffect(() => {
-    if (!selectedNode && data.nodes.length > 0) {
-      const appNode = data.nodes.find(n => n.type === 'APPLICATION') || data.nodes[0];
-      setSelectedNode(appNode);
-    }
-  }, [data.nodes, selectedNode]);
 
   return (
     <div
