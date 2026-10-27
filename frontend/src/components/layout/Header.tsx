@@ -11,7 +11,7 @@ import {
 import { useRegion } from '../../context/RegionContext';
 import { useRole } from '../../context/RoleContext';
 import { useTheme } from '../../context/ThemeContext';
-import { getNotifications } from '../../lib/api';
+import { getNotifications, getNotificationSummary } from '../../lib/api';
 import type { NotificationRecord, Role } from '../../types/domain';
 
 export function Header() {
@@ -22,11 +22,15 @@ export function Header() {
 
   const [bellOpen, setBellOpen] = useState(false);
   const [recentNotifs, setRecentNotifs] = useState<NotificationRecord[]>([]);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     getNotifications()
       .then(res => setRecentNotifs(res.slice(0, 5)))
+      .catch(() => {});
+    getNotificationSummary()
+      .then(s => setUnreadCount(s.unread))
       .catch(() => {});
   }, [bellOpen]);
 
@@ -175,6 +179,29 @@ export function Header() {
             }}
           >
             <Bell size={18} />
+            {unreadCount > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: 2,
+                  right: 2,
+                  minWidth: 16,
+                  height: 16,
+                  borderRadius: 8,
+                  background: 'var(--status-bad-solid)',
+                  color: '#ffffff',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '0 3px',
+                  boxSizing: 'border-box',
+                }}
+              >
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
           </button>
 
           {bellOpen && (

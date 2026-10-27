@@ -9,6 +9,7 @@ import type {
   EligibleExpertsResponse,
   ExpertDetail,
   IntegrationStatus,
+  PortalSyncReceipt,
   NotificationRecord,
   NotificationSummary,
   Region,
@@ -242,9 +243,18 @@ export function syncPortal(payload?: {
   externalApplicationId?: string;
   institutionCode?: string;
   institutionName?: string;
+  institutionType?: string;
   region?: string;
-}): Promise<unknown> {
-  return apiFetch('/api/v1/integration/sync-portal', {
+  academicYear?: string;
+  applicationType?: string;
+  address?: string;
+  contactEmail?: string;
+  establishedYear?: number;
+  campusName?: string;
+  landAreaAcres?: number;
+  builtUpAreaSqM?: number;
+}): Promise<PortalSyncReceipt> {
+  return apiFetch<PortalSyncReceipt>('/api/v1/integration/sync-portal', {
     method: 'POST',
     body: JSON.stringify(payload || {}),
   });

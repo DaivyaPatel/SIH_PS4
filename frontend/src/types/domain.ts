@@ -401,10 +401,27 @@ export interface DashboardSummary {
   generatedAt: string;
 }
 
+export type SyncOutcome = 'INGESTED' | 'DUPLICATE_SKIPPED' | 'VALIDATION_FAILED';
+
+export interface PortalSyncReceipt {
+  receiptId: string;
+  externalApplicationId: string;
+  caseId: string | null;
+  applicationNumber: string | null;
+  outcome: SyncOutcome;
+  message: string;
+  correlationId: string;
+  syncedAt: string;
+}
+
 export interface IntegrationStatus {
   connected: boolean;
-  sourceSystemName: string;
-  totalSyncedCases: number;
-  ingestedCount: number;
-  lastSuccessfulSyncAt: string | null;
+  sourcePortal?: string;
+  sourceSystemName?: string;
+  totalSyncCount?: number;
+  totalSyncedCases?: number;
+  totalIngestedCount?: number;
+  ingestedCount?: number;
+  lastSyncAt?: string | null;
+  lastSuccessfulSyncAt?: string | null;
 }
