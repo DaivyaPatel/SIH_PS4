@@ -9,7 +9,6 @@ import {
   Search,
   ExternalLink,
   PlusCircle,
-  Upload,
   ArrowUpDown,
 } from 'lucide-react';
 import type {
@@ -22,6 +21,7 @@ import type {
 } from '../../types/domain';
 import { Button } from '../common/Button';
 import { EmptyState } from '../common/EmptyState';
+import { DeficiencyCard } from '../deficiencies/DeficiencyCard';
 import { getCaseTimeline, getCaseAudit } from '../../lib/api';
 import { useRole } from '../../context/RoleContext';
 
@@ -33,6 +33,7 @@ interface CaseDetailTabsProps {
   onOpenFlagDeficiency: () => void;
   onOpenRespondDeficiency: (def: DeficiencyDetail) => void;
   onOpenResolveDeficiency: (def: DeficiencyDetail) => void;
+  onRefresh?: () => void;
 }
 
 export function CaseDetailTabs({
@@ -41,10 +42,9 @@ export function CaseDetailTabs({
   caseData,
   onSelectDocument,
   onOpenFlagDeficiency,
-  onOpenRespondDeficiency,
-  onOpenResolveDeficiency,
+  onRefresh,
 }: CaseDetailTabsProps) {
-  const { role, permissions } = useRole();
+  const { permissions } = useRole();
 
   // Timeline state
   const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
@@ -299,115 +299,28 @@ export function CaseDetailTabs({
               description="This application currently satisfies all statutory scrutiny criteria with zero open defects."
             />
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {caseData.deficiencies.map(def => {
-                const isResolved = def.status === 'RESOLVED';
-                const isResubmitted = def.status === 'RESUBMITTED';
-                const isOpen = def.status === 'OPEN';
-
-                return (
-                  <div
-                    key={def.id}
-                    style={{
-                      background: 'var(--bg-surface)',
-                      border: `1px solid ${isResolved ? 'var(--status-ok-border)' : 'var(--status-bad-border)'}`,
-                      borderRadius: 8,
-                      padding: 16,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 10,
-                      boxShadow: 'var(--shadow-sm)',
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          padding: '2px 8px',
-                          borderRadius: 4,
-                          background: 'var(--bg-subtle)',
-                          border: '1px solid var(--border)',
-                          color: 'var(--text-primary)',
-                        }}
-                      >
-                        {def.category.replace(/_/g, ' ')}
-                      </span>
-
-                      <span
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          padding: '2px 8px',
-                          borderRadius: 4,
-                          background: isResolved
-                            ? 'var(--status-ok-tint)'
-                            : isResubmitted
-                            ? 'var(--status-info-tint)'
-                            : 'var(--status-bad-tint)',
-                          color: isResolved
-                            ? 'var(--status-ok-text)'
-                            : isResubmitted
-                            ? 'var(--status-info-text)'
-                            : 'var(--status-bad-text)',
-                        }}
-                      >
-                        {def.status}
-                      </span>
-                    </div>
-
-                    <div style={{ fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.4 }}>
-                      {def.description}
-                    </div>
-
-                    {/* Metadata & Actions row */}
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        borderTop: '1px solid var(--border)',
-                        paddingTop: 10,
-                        flexWrap: 'wrap',
-                        gap: 10,
-                      }}
-                    >
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                        Flagged: {new Date(def.flaggedAt).toLocaleDateString()} · Cure window: {def.deadlineDays} statutory days
-                        {def.proofDocumentName && (
-                          <span style={{ marginLeft: 12, color: 'var(--accent)', fontWeight: 600 }}>
-                            Proof: {def.proofDocumentName}
-                          </span>
-                        )}
-                      </div>
-
-                      <div style={{ display: 'flex', gap: 8 }}>
-                        {isOpen && role === 'INSTITUTION_ADMIN' && (
-                          <Button
-                            size="sm"
-                            variant="primary"
-                            leftIcon={<Upload size={13} />}
-                            onClick={() => onOpenRespondDeficiency(def)}
-                          >
-                            Submit Compliance Response
-                          </Button>
-                        )}
-
-                        {!isResolved && permissions.canResolveDeficiencies && (
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            leftIcon={<CheckCircle2 size={13} />}
-                            onClick={() => onOpenResolveDeficiency(def)}
-                          >
-                            Verify & Resolve
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {caseData.deficiencies.map((def, idx) => (
+                <DeficiencyCard
+                  key={def.id}
+                  deficiency={def}
+                  caseId={caseData.id}
+                  applicationNumber={caseData.applicationNumber}
+                  onRefresh={onRefresh || (() => {})}
+                  onPreviewProof={(docName, docUrl) => {
+                    onSelectDocument({
+                      id: `proof-${Date.now()}`,
+                      documentType: 'COMPLIANCE_PROOF_RECORD',
+                      documentName: docName,
+                      fileHash: docUrl ? `sha256-${btoa(docName).slice(0, 32)}` : 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+                      verificationStatus: 'VERIFIED',
+                      validUntil: '2028-06-30',
+                      uploadedAt: new Date().toISOString(),
+                    });
+                  }}
+                  defaultExpanded={idx === 0 || def.status !== 'RESOLVED'}
+                />
+              ))}
             </div>
           )}
         </div>

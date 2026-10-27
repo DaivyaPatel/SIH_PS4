@@ -137,6 +137,7 @@ export function CaseDetailRoute() {
           onOpenFlagDeficiency={() => setFlagModalOpen(true)}
           onOpenRespondDeficiency={def => setRespondDef(def)}
           onOpenResolveDeficiency={def => setResolveDef(def)}
+          onRefresh={loadCaseData}
         />
 
         {/* Right Column: 320px Sticky Right Rail */}
