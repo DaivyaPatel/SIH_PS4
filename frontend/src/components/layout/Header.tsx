@@ -14,7 +14,11 @@ import { useTheme } from '../../context/ThemeContext';
 import { getNotifications, getNotificationSummary } from '../../lib/api';
 import type { NotificationRecord, Role } from '../../types/domain';
 
-export function Header() {
+interface HeaderProps {
+  onOpenPalette?: () => void;
+}
+
+export function Header({ onOpenPalette }: HeaderProps = {}) {
   const { selectedRegion, setSelectedRegion } = useRegion();
   const { role, setRole } = useRole();
   const { theme, toggleTheme } = useTheme();
@@ -73,7 +77,7 @@ export function Header() {
       {/* Search Input trigger */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
-          onClick={() => navigate('/cases')}
+          onClick={() => (onOpenPalette ? onOpenPalette() : navigate('/cases'))}
           style={{
             display: 'flex',
             alignItems: 'center',

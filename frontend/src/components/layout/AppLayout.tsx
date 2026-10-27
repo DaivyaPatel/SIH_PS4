@@ -1,9 +1,24 @@
+import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { Breadcrumbs } from './Breadcrumbs';
+import { CommandPalette } from '../common/CommandPalette';
 
 export function AppLayout() {
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setPaletteOpen(prev => !prev);
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-page)' }}>
       <Sidebar />
@@ -29,7 +44,7 @@ export function AppLayout() {
           </span>
         </div>
 
-        <Header />
+        <Header onOpenPalette={() => setPaletteOpen(true)} />
 
         <main
           style={{
@@ -59,6 +74,12 @@ export function AppLayout() {
           <span>Approval Coordination & Compliance Monitoring Service · v0.1.0</span>
           <span>Regulatory decisions remain exclusively with the statutory authority</span>
         </footer>
+
+        {/* Global Command Palette */}
+        <CommandPalette
+          isOpen={paletteOpen}
+          onClose={() => setPaletteOpen(false)}
+        />
       </div>
     </div>
   );
