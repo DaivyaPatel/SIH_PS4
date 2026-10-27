@@ -261,14 +261,15 @@ export interface ExpertDetail {
   domain: string;
   affiliatedInstitution: string;
   region: Region;
-  conflictInstitutions: string[];
+  conflictInstitutions: string[] | string;
   availableDates: string[];
   maxAssignments: number;
   active: boolean;
 }
 
 export interface ExpertEligibilityResult {
-  id: string;
+  id?: string;
+  expertId?: string;
   name: string;
   domain: string;
   affiliatedInstitution: string;
@@ -294,25 +295,31 @@ export interface ScheduledCommitteeMember {
   name: string;
   domain: string;
   designation: string;
-  institution: string;
+  institution?: string;
+  affiliatedInstitution?: string;
   region: Region;
-  role: 'CHAIRMAN' | 'MEMBER';
+  role: 'CHAIRMAN' | 'MEMBER' | string;
 }
 
 export interface ScheduledVisitAssignment {
   caseId: string;
   applicationNumber: string;
   institutionName: string;
-  region: Region;
-  inspectionDate: string;
+  region?: Region;
+  institutionRegion?: Region;
+  inspectionDate?: string;
+  scheduledInspectionDate?: string;
   committeeMembers: ScheduledCommitteeMember[];
 }
 
 export interface ScheduleOptimizationResponse {
   solverStatus: string;
-  solveDurationMs: number;
-  totalCasesEvaluated: number;
-  totalVisitsScheduled: number;
+  solveDurationMs?: number;
+  solveTimeMs?: number;
+  totalCasesEvaluated?: number;
+  totalCasesRequested?: number;
+  totalVisitsScheduled?: number;
+  totalCasesScheduled?: number;
   scheduledVisits: ScheduledVisitAssignment[];
   unassignedCases: Array<{ caseId: string; applicationNumber: string; reason: string }>;
   solverNotes: string;

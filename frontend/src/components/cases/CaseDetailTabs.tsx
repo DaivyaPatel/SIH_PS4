@@ -10,6 +10,7 @@ import {
   ExternalLink,
   PlusCircle,
   ArrowUpDown,
+  Users,
 } from 'lucide-react';
 import type {
   CaseDetail,
@@ -22,6 +23,7 @@ import type {
 import { Button } from '../common/Button';
 import { EmptyState } from '../common/EmptyState';
 import { DeficiencyCard } from '../deficiencies/DeficiencyCard';
+import { CaseExpertVisitCard } from '../visits/CaseExpertVisitCard';
 import { getCaseTimeline, getCaseAudit } from '../../lib/api';
 import { useRole } from '../../context/RoleContext';
 
@@ -84,6 +86,7 @@ export function CaseDetailTabs({
     { label: `Documents (${caseData.documents.length})`, icon: FileText },
     { label: 'Timeline', icon: Clock },
     { label: 'Audit Trail', icon: ShieldCheck },
+    { label: 'Expert Committee', icon: Users },
   ];
 
   return (
@@ -680,6 +683,11 @@ export function CaseDetailTabs({
             </table>
           </div>
         </div>
+      )}
+
+      {/* Tab 5: Expert Committee */}
+      {activeTab === 5 && (
+        <CaseExpertVisitCard caseData={caseData} />
       )}
     </div>
   );
