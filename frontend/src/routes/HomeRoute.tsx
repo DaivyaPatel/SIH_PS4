@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, RefreshCw } from 'lucide-react';
-import { getDashboardSummary, getCases } from '../lib/api';
+import { getDashboardSummary, getCases, getCaseById } from '../lib/api';
 import { useRegion } from '../context/RegionContext';
 import { useRole } from '../context/RoleContext';
 import { Skeleton } from '../components/common/Skeleton';
@@ -12,7 +12,9 @@ import { RegulatoryClockBar } from '../components/dashboard/RegulatoryClockBar';
 import { NeedsAttentionQueue } from '../components/dashboard/NeedsAttentionQueue';
 import { InstitutionDashboardCard } from '../components/dashboard/InstitutionDashboardCard';
 import { ExpertVisitsCard } from '../components/dashboard/ExpertVisitsCard';
-import type { DashboardSummary, CaseSummary } from '../types/domain';
+import { RelationshipGraphCanvas } from '../components/graph/RelationshipGraphCanvas';
+import { buildGraphDataFromCase } from '../lib/graphData';
+import type { DashboardSummary, CaseSummary, CaseDetail } from '../types/domain';
 
 export function HomeRoute() {
   const { selectedRegion } = useRegion();
@@ -21,6 +23,7 @@ export function HomeRoute() {
 
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [cases, setCases] = useState<CaseSummary[]>([]);
+  const [primaryCaseDetail, setPrimaryCaseDetail] = useState<CaseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,6 +38,13 @@ export function HomeRoute() {
       .then(([summaryData, caseData]) => {
         setSummary(summaryData);
         setCases(caseData);
+        if (caseData && caseData.length > 0) {
+          getCaseById(caseData[0].id)
+            .then(detail => setPrimaryCaseDetail(detail))
+            .catch(() => {
+              // Silently handle if individual case fetch fails
+            });
+        }
         setLoading(false);
       })
       .catch((err: Error) => {
@@ -178,6 +188,19 @@ export function HomeRoute() {
           {/* Scrutiny Officer and Standard Role Priority Queue */}
           {role !== 'REGIONAL_OFFICER' && role !== 'INSTITUTION_ADMIN' && (
             <NeedsAttentionQueue cases={cases} role={role} />
+          )}
+
+          {/* Interactive 5-Column Relationship Topology Graph for Primary Active Case */}
+          {primaryCaseDetail && (
+            <div style={{ marginTop: 4 }}>
+              <RelationshipGraphCanvas
+                data={buildGraphDataFromCase(primaryCaseDetail)}
+                height={460}
+                title={`Topological Relationship Graph · ${primaryCaseDetail.applicationNumber}`}
+                subtitle={`Explorable 5-column statutory compliance dependency map for ${primaryCaseDetail.institution.name}`}
+                onRefresh={loadDashboardData}
+              />
+            </div>
           )}
         </>
       )}

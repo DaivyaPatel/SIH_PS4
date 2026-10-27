@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Building2,
   AlertTriangle,
@@ -11,6 +11,7 @@ import {
   PlusCircle,
   ArrowUpDown,
   Users,
+  Network,
 } from 'lucide-react';
 import type {
   CaseDetail,
@@ -24,6 +25,8 @@ import { Button } from '../common/Button';
 import { EmptyState } from '../common/EmptyState';
 import { DeficiencyCard } from '../deficiencies/DeficiencyCard';
 import { CaseExpertVisitCard } from '../visits/CaseExpertVisitCard';
+import { RelationshipGraphCanvas } from '../graph/RelationshipGraphCanvas';
+import { buildGraphDataFromCase } from '../../lib/graphData';
 import { getCaseTimeline, getCaseAudit } from '../../lib/api';
 import { useRole } from '../../context/RoleContext';
 
@@ -87,7 +90,10 @@ export function CaseDetailTabs({
     { label: 'Timeline', icon: Clock },
     { label: 'Audit Trail', icon: ShieldCheck },
     { label: 'Expert Committee', icon: Users },
+    { label: 'Relationships', icon: Network },
   ];
+
+  const graphData = useMemo(() => buildGraphDataFromCase(caseData), [caseData]);
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -688,6 +694,17 @@ export function CaseDetailTabs({
       {/* Tab 5: Expert Committee */}
       {activeTab === 5 && (
         <CaseExpertVisitCard caseData={caseData} />
+      )}
+
+      {/* Tab 6: Relationships */}
+      {activeTab === 6 && (
+        <RelationshipGraphCanvas
+          data={graphData}
+          height={540}
+          title={`Topological Relationship Graph — ${caseData.applicationNumber}`}
+          subtitle={`Tracing statutory compliance neighbourhood for ${caseData.institution.name}`}
+          onRefresh={onRefresh}
+        />
       )}
     </div>
   );
