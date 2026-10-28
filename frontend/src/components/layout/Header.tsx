@@ -5,12 +5,14 @@ import {
   Bell,
   Sun,
   Moon,
-  Globe,
-  UserCheck,
+  ChevronDown,
+  User,
+  Sliders,
+  Settings,
 } from 'lucide-react';
-import { useRegion } from '../../context/RegionContext';
 import { useRole } from '../../context/RoleContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useDensity } from '../../context/DensityContext';
 import { getNotifications, getNotificationSummary } from '../../lib/api';
 import type { NotificationRecord, Role } from '../../types/domain';
 
@@ -19,15 +21,18 @@ interface HeaderProps {
 }
 
 export function Header({ onOpenPalette }: HeaderProps = {}) {
-  const { selectedRegion, setSelectedRegion } = useRegion();
-  const { role, setRole } = useRole();
+  const { role, setRole, permissions } = useRole();
   const { theme, toggleTheme } = useTheme();
+  const { density, toggleDensity } = useDensity();
   const navigate = useNavigate();
 
   const [bellOpen, setBellOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [recentNotifs, setRecentNotifs] = useState<NotificationRecord[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const bellRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     getNotifications()
@@ -40,15 +45,16 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (bellRef.current && !bellRef.current.contains(event.target as Node)) {
         setBellOpen(false);
       }
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false);
+      }
     }
-    if (bellOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+    document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [bellOpen]);
+  }, []);
 
   const roles: Array<{ key: Role; label: string }> = [
     { key: 'REGIONAL_OFFICER', label: 'Regional Officer' },
@@ -57,176 +63,62 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
     { key: 'EVC_EXPERT', label: 'EVC Expert' },
   ];
 
-  const regions = ['ALL', 'WRO', 'SRO', 'NRO', 'ERO', 'CRO'] as const;
-
   return (
     <header
       style={{
-        height: 60,
+        height: 48,
         background: 'var(--bg-surface)',
         borderBottom: '1px solid var(--border)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 32px',
+        padding: '0 24px',
         position: 'sticky',
         top: 0,
         zIndex: 40,
-        boxShadow: 'var(--shadow-sm)',
       }}
     >
-      {/* Left: Quick Search trigger & Simulation Pill */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      {/* Left: Quick Search button */}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
         <button
           onClick={() => (onOpenPalette ? onOpenPalette() : navigate('/cases'))}
+          aria-label="Search cases or commands"
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 10,
-            padding: '6px 14px',
+            gap: 8,
+            padding: '5px 10px',
             background: 'var(--bg-subtle)',
             border: '1px solid var(--border)',
-            borderRadius: 8,
-            color: 'var(--text-secondary)',
-            fontSize: 13,
+            borderRadius: 'var(--radius-sm)',
+            color: 'var(--text-muted)',
+            fontSize: 12,
             cursor: 'pointer',
-            minWidth: 280,
-            transition: 'border-color 0.15s ease, background 0.15s ease',
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.borderColor = 'var(--border-strong)';
-            e.currentTarget.style.background = 'var(--bg-hover)';
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.borderColor = 'var(--border)';
-            e.currentTarget.style.background = 'var(--bg-subtle)';
+            minWidth: 260,
           }}
         >
           <Search size={14} style={{ color: 'var(--text-muted)' }} />
-          <span style={{ flex: 1, textAlign: 'left', color: 'var(--text-muted)' }}>Search cases, colleges, stages…</span>
+          <span style={{ flex: 1, textAlign: 'left' }}>Search cases or colleges…</span>
           <kbd
             style={{
-              fontSize: 11,
+              fontSize: 10,
               fontFamily: 'monospace',
               background: 'var(--bg-surface)',
               border: '1px solid var(--border)',
-              borderRadius: 4,
-              padding: '1px 6px',
+              borderRadius: 3,
+              padding: '1px 5px',
               color: 'var(--text-secondary)',
             }}
           >
             ⌘K
           </kbd>
         </button>
-
-        {/* Live Simulation Indicator Pill */}
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 11,
-            fontWeight: 500,
-            padding: '3px 10px',
-            borderRadius: 9999,
-            background: 'var(--status-ok-tint)',
-            color: 'var(--status-ok-text)',
-            border: '1px solid var(--status-ok-border)',
-          }}
-        >
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: 'var(--status-ok-solid)',
-              display: 'inline-block',
-            }}
-          />
-          Live Simulated · IST
-        </span>
       </div>
 
-      {/* Right: Global Context Pickers & Utilities */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {/* Region Selector */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '3px 8px',
-            borderRadius: 8,
-            background: 'var(--bg-subtle)',
-            border: '1px solid var(--border)',
-          }}
-        >
-          <Globe size={13} style={{ color: 'var(--text-muted)' }} />
-          <select
-            value={selectedRegion}
-            onChange={e => setSelectedRegion(e.target.value as (typeof regions)[number])}
-            aria-label="Filter by region"
-            style={{
-              padding: '3px 4px',
-              borderRadius: 4,
-              fontSize: 12,
-              fontWeight: 500,
-              background: 'transparent',
-              color: 'var(--text-primary)',
-              border: 'none',
-              cursor: 'pointer',
-              outline: 'none',
-            }}
-          >
-            {regions.map(r => (
-              <option key={r} value={r}>
-                {r === 'ALL' ? 'All Regions' : `Region: ${r}`}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Role Switcher */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '3px 8px',
-            borderRadius: 8,
-            background: 'var(--accent-subtle)',
-            border: '1px solid var(--accent-border)',
-          }}
-        >
-          <UserCheck size={13} style={{ color: 'var(--accent)' }} />
-          <select
-            value={role}
-            onChange={e => setRole(e.target.value as Role)}
-            aria-label="Switch active role"
-            style={{
-              padding: '3px 4px',
-              borderRadius: 4,
-              fontSize: 12,
-              fontWeight: 600,
-              background: 'transparent',
-              color: 'var(--accent)',
-              border: 'none',
-              cursor: 'pointer',
-              outline: 'none',
-            }}
-          >
-            {roles.map(r => (
-              <option key={r.key} value={r.key}>
-                {r.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div style={{ width: 1, height: 20, background: 'var(--border)', margin: '0 2px' }} />
-
+      {/* Right: Notifications Bell & User Menu */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         {/* Notification Bell Dropdown */}
-        <div style={{ position: 'relative' }} ref={dropdownRef}>
+        <div style={{ position: 'relative' }} ref={bellRef}>
           <button
             onClick={() => setBellOpen(!bellOpen)}
             aria-label="Notifications"
@@ -235,33 +127,31 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
               border: '1px solid var(--border)',
               color: 'var(--text-secondary)',
               cursor: 'pointer',
-              padding: '7px 8px',
-              borderRadius: 8,
+              padding: '6px 7px',
+              borderRadius: 'var(--radius-sm)',
               display: 'flex',
               alignItems: 'center',
               position: 'relative',
-              transition: 'background 0.15s ease',
             }}
           >
-            <Bell size={16} />
+            <Bell size={15} />
             {unreadCount > 0 && (
               <span
                 style={{
                   position: 'absolute',
-                  top: -3,
-                  right: -3,
-                  minWidth: 16,
-                  height: 16,
-                  borderRadius: 8,
-                  background: 'var(--status-bad-solid)',
+                  top: -4,
+                  right: -4,
+                  minWidth: 15,
+                  height: 15,
+                  borderRadius: 9999,
+                  background: 'var(--status-bad)',
                   color: '#ffffff',
-                  fontSize: 10,
+                  fontSize: 9,
                   fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  padding: '0 3px',
-                  boxSizing: 'border-box',
+                  padding: '0 2px',
                 }}
               >
                 {unreadCount > 9 ? '9+' : unreadCount}
@@ -273,14 +163,14 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
             <div
               style={{
                 position: 'absolute',
-                top: 40,
+                top: 36,
                 right: 0,
                 width: 320,
                 background: 'var(--bg-surface)',
                 border: '1px solid var(--border)',
-                borderRadius: 10,
-                boxShadow: 'var(--shadow-lg)',
-                padding: 14,
+                borderRadius: 'var(--radius-md)',
+                boxShadow: 'var(--shadow-md)',
+                padding: 12,
                 zIndex: 100,
               }}
             >
@@ -289,12 +179,12 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  marginBottom: 10,
-                  paddingBottom: 8,
+                  marginBottom: 8,
+                  paddingBottom: 6,
                   borderBottom: '1px solid var(--border)',
                 }}
               >
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Notifications</span>
+                <span style={{ fontSize: 13, fontWeight: 600 }}>Notifications</span>
                 <button
                   onClick={() => {
                     setBellOpen(false);
@@ -305,20 +195,20 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
                     border: 0,
                     color: 'var(--accent)',
                     fontSize: 12,
-                    fontWeight: 600,
+                    fontWeight: 500,
                     cursor: 'pointer',
                   }}
                 >
-                  View inbox
+                  View notifications
                 </button>
               </div>
 
               {recentNotifs.length === 0 ? (
-                <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>
-                  All statutory notifications acknowledged
+                <div style={{ padding: '16px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>
+                  No unread notifications
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   {recentNotifs.map(n => (
                     <div
                       key={n.id}
@@ -328,19 +218,16 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
                         else navigate('/notifications');
                       }}
                       style={{
-                        padding: '8px 10px',
-                        borderRadius: 6,
+                        padding: '6px 8px',
+                        borderRadius: 'var(--radius-sm)',
                         background: 'var(--bg-subtle)',
                         fontSize: 12,
                         cursor: 'pointer',
-                        transition: 'background 0.15s ease',
                       }}
-                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-hover)')}
-                      onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg-subtle)')}
                     >
                       <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{n.title}</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
-                        {n.content.substring(0, 60)}…
+                      <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                        {n.content.substring(0, 65)}…
                       </div>
                     </div>
                   ))}
@@ -350,26 +237,193 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
           )}
         </div>
 
-        {/* Theme Toggle */}
-        <button
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-          style={{
-            background: 'transparent',
-            border: '1px solid var(--border)',
-            color: 'var(--text-secondary)',
-            cursor: 'pointer',
-            padding: '7px 8px',
-            borderRadius: 8,
-            display: 'flex',
-            alignItems: 'center',
-            transition: 'background 0.15s ease',
-          }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-subtle)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-        >
-          {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
-        </button>
+        {/* User / Officer Menu Dropdown */}
+        <div style={{ position: 'relative' }} ref={userMenuRef}>
+          <button
+            onClick={() => setUserMenuOpen(!userMenuOpen)}
+            aria-label="User profile and settings"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '4px 8px',
+              borderRadius: 'var(--radius-sm)',
+              background: userMenuOpen ? 'var(--bg-subtle)' : 'transparent',
+              border: '1px solid var(--border)',
+              color: 'var(--text-primary)',
+              cursor: 'pointer',
+              fontSize: 12,
+            }}
+          >
+            <div
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 'var(--radius-sm)',
+                background: 'var(--bg-subtle)',
+                color: 'var(--text-secondary)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <User size={13} />
+            </div>
+            <span style={{ fontWeight: 500 }}>{permissions.roleDisplayName}</span>
+            <ChevronDown size={13} style={{ color: 'var(--text-muted)' }} />
+          </button>
+
+          {userMenuOpen && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 36,
+                right: 0,
+                width: 260,
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: 'var(--shadow-md)',
+                padding: 10,
+                zIndex: 100,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 8,
+              }}
+            >
+              {/* Officer Profile Details */}
+              <div style={{ paddingBottom: 8, borderBottom: '1px solid var(--border)' }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Dr. S. K. Joshi</div>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{permissions.roleDisplayName} · WRO Jurisdiction</div>
+              </div>
+
+              {/* Theme & Density Toggles */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <button
+                  onClick={toggleTheme}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '6px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: 0,
+                    background: 'transparent',
+                    color: 'var(--text-secondary)',
+                    fontSize: 12,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-subtle)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {theme === 'light' ? <Moon size={14} /> : <Sun size={14} />}
+                    <span>Theme</span>
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)' }}>
+                    {theme === 'light' ? 'Light' : 'Dark'}
+                  </span>
+                </button>
+
+                <button
+                  onClick={toggleDensity}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '6px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: 0,
+                    background: 'transparent',
+                    color: 'var(--text-secondary)',
+                    fontSize: 12,
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-subtle)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Sliders size={14} />
+                    <span>Table Density</span>
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)' }}>
+                    {density === 'compact' ? 'Compact (32px)' : 'Comfortable (40px)'}
+                  </span>
+                </button>
+              </div>
+
+              {/* Developer / Demo Mode Section */}
+              <div style={{ paddingTop: 8, borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Developer & Demo
+                </div>
+
+                <div style={{ fontSize: 11, color: 'var(--status-ok-text)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--status-ok)' }} />
+                  Live Simulated · IST (UTC+05:30)
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <label htmlFor="role-select" style={{ fontSize: 11, color: 'var(--text-muted)' }}>Persona role:</label>
+                  <select
+                    id="role-select"
+                    value={role}
+                    onChange={e => {
+                      setRole(e.target.value as Role);
+                      setUserMenuOpen(false);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '4px 6px',
+                      borderRadius: 'var(--radius-sm)',
+                      border: '1px solid var(--border)',
+                      background: 'var(--bg-subtle)',
+                      color: 'var(--text-primary)',
+                      fontSize: 12,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {roles.map(r => (
+                      <option key={r.key} value={r.key}>
+                        {r.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Settings Link */}
+              <div style={{ paddingTop: 6, borderTop: '1px solid var(--border)' }}>
+                <button
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    navigate('/settings');
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    width: '100%',
+                    padding: '6px 8px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: 0,
+                    background: 'transparent',
+                    color: 'var(--text-secondary)',
+                    fontSize: 12,
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-subtle)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                >
+                  <Settings size={14} />
+                  <span>All Settings</span>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

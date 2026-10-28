@@ -23,7 +23,7 @@ describe('Phase 0 - Primitive Component Library', () => {
 
     const flaggedHtml = renderToStaticMarkup(<StatusChip status="DEFICIENCY_FLAGGED" />);
     expect(flaggedHtml).toContain('Deficiency Flagged');
-    expect(flaggedHtml).toContain('var(--status-bad-tint)');
+    expect(flaggedHtml).toContain('var(--status-warn-tint)');
 
     const scrutinyHtml = renderToStaticMarkup(<StatusChip status="UNDER_SCRUTINY" />);
     expect(scrutinyHtml).toContain('Under Scrutiny');

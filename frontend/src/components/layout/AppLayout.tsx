@@ -29,7 +29,7 @@ export function AppLayout() {
         <main
           style={{
             flex: 1,
-            padding: '28px 36px 48px',
+            padding: '20px 24px 36px',
             maxWidth: 1440,
             width: '100%',
             margin: '0 auto',
@@ -38,22 +38,6 @@ export function AppLayout() {
           <Breadcrumbs />
           <Outlet />
         </main>
-
-        <footer
-          style={{
-            padding: '14px 36px',
-            borderTop: '1px solid var(--border)',
-            fontSize: 12,
-            color: 'var(--text-muted)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            background: 'var(--bg-surface)',
-          }}
-        >
-          <span>Approval Coordination & Compliance Monitoring Service · AY 2026-27</span>
-          <span style={{ fontSize: 11 }}>AICTE National Council for Technical Education</span>
-        </footer>
 
         {/* Global Command Palette */}
         <CommandPalette

@@ -1,272 +1,627 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowRight, RefreshCw, Network } from 'lucide-react';
-import { getDashboardSummary, getCases, getCaseById } from '../lib/api';
-import { useRegion } from '../context/RegionContext';
+import { useEffect, useState, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { RefreshCw, AlertTriangle, Clock, X, ChevronDown, ChevronRight } from 'lucide-react';
+import { getCases } from '../lib/api';
 import { useRole } from '../context/RoleContext';
-import { Skeleton } from '../components/common/Skeleton';
-import { Button } from '../components/common/Button';
-import { ExecutiveKpiStrip } from '../components/dashboard/ExecutiveKpiStrip';
-import { PipelineFunnelChart } from '../components/dashboard/PipelineFunnelChart';
-import { RegulatoryClockBar } from '../components/dashboard/RegulatoryClockBar';
-import { NeedsAttentionQueue } from '../components/dashboard/NeedsAttentionQueue';
-import { InstitutionDashboardCard } from '../components/dashboard/InstitutionDashboardCard';
-import { ExpertVisitsCard } from '../components/dashboard/ExpertVisitsCard';
-import { RelationshipGraphCanvas } from '../components/graph/RelationshipGraphCanvas';
-import { buildGraphDataFromCase } from '../lib/graphData';
-import type { DashboardSummary, CaseSummary, CaseDetail } from '../types/domain';
+import { computeUnifiedMetrics, deriveCaseState, verifyDataConsistency, type ClockState } from '../lib/caseLogic';
+import { OfficerCaseTable } from '../components/common/OfficerCaseTable';
+import { CaseSidePanel } from '../components/common/CaseSidePanel';
+import { EscalationBanner } from '../components/common/EscalationBanner';
+import type { CaseSummary } from '../types/domain';
+
+type ActiveSummaryFilter = 'overdue' | 'due_soon' | 'waiting_you' | 'waiting_others' | null;
 
 export function HomeRoute() {
-  const { selectedRegion } = useRegion();
-  const { role, permissions } = useRole();
+  const { permissions } = useRole();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const caseIdFromUrl = searchParams.get('caseId');
 
-  const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [cases, setCases] = useState<CaseSummary[]>([]);
-  const [primaryCaseDetail, setPrimaryCaseDetail] = useState<CaseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showTopology, setShowTopology] = useState(false);
+  const [updatedTime, setUpdatedTime] = useState<string>('');
 
-  const loadDashboardData = () => {
+  // Filters state
+  const [summaryFilter, setSummaryFilter] = useState<ActiveSummaryFilter>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [regionFilter, setRegionFilter] = useState<string>('ALL');
+  const [stageFilter, setStageFilter] = useState<string>('ALL');
+  const [waitingFilter, setWaitingFilter] = useState<string>('ALL');
+  const [savedView, setSavedView] = useState<string>('MY_QUEUE');
+
+  // Secondary section collapsed state
+  const [otherCasesOpen, setOtherCasesOpen] = useState(false);
+
+  // Side panel state
+  const [selectedCase, setSelectedCase] = useState<CaseSummary | null>(null);
+  const [originEl, setOriginEl] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (caseIdFromUrl && cases.length > 0) {
+      const match = cases.find(c => c.id === caseIdFromUrl || c.applicationNumber === caseIdFromUrl);
+      if (match) setSelectedCase(match);
+    }
+  }, [caseIdFromUrl, cases]);
+
+  const loadData = () => {
     setLoading(true);
     setError(null);
 
-    Promise.all([
-      getDashboardSummary(selectedRegion),
-      getCases('ALL', selectedRegion),
-    ])
-      .then(([summaryData, caseData]) => {
-        setSummary(summaryData);
-        setCases(caseData);
-        if (caseData && caseData.length > 0) {
-          getCaseById(caseData[0].id)
-            .then(detail => setPrimaryCaseDetail(detail))
-            .catch(() => {
-              // Silently handle if individual case fetch fails
-            });
-        }
+    getCases('ALL', 'ALL')
+      .then(res => {
+        setCases(res);
         setLoading(false);
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        setUpdatedTime(`${hh}:${mm}`);
+
+        // Dev-only data consistency check
+        if (process.env.NODE_ENV !== 'production') {
+          const errors = verifyDataConsistency(res);
+          if (errors.length > 0) {
+            console.warn('[Consistency Check Failed]', errors);
+          }
+        }
       })
       .catch((err: Error) => {
-        setError(err.message || 'Unable to retrieve dashboard metrics.');
+        setError(err.message || 'Unable to retrieve cases queue.');
         setLoading(false);
       });
   };
 
   useEffect(() => {
-    loadDashboardData();
-  }, [selectedRegion]);
+    loadData();
+  }, []);
+
+  // Shared single source of truth metrics
+  const metrics = useMemo(() => {
+    return computeUnifiedMetrics(cases);
+  }, [cases]);
+
+  // Derived state mapping
+  const derivedMap = useMemo(() => {
+    const map = new Map<string, ReturnType<typeof deriveCaseState>>();
+    for (const c of cases) {
+      map.set(c.id, deriveCaseState(c));
+    }
+    return map;
+  }, [cases]);
+
+  // Handle saved view selection
+  const handleSavedViewChange = (view: string) => {
+    setSavedView(view);
+    setSummaryFilter(null);
+    setSearchQuery('');
+    setRegionFilter('ALL');
+
+    if (view === 'MY_QUEUE') {
+      setStageFilter('ALL');
+      setWaitingFilter('ALL');
+    } else if (view === 'DUE_THIS_WEEK') {
+      setStageFilter('ALL');
+      setWaitingFilter('ALL');
+      setSummaryFilter('due_soon');
+    } else if (view === 'DEFICIENCIES') {
+      setStageFilter('Cure');
+      setWaitingFilter('ALL');
+    } else if (view === 'EVC_PENDING') {
+      setStageFilter('EVC Visit');
+      setWaitingFilter('ALL');
+    }
+  };
+
+  // Filter cases logic
+  const filterCase = (c: CaseSummary) => {
+    const d = derivedMap.get(c.id);
+    if (!d) return false;
+
+    // Summary strip filter
+    if (summaryFilter === 'overdue' && d.clockState !== 'overdue') return false;
+    if (summaryFilter === 'due_soon' && d.clockState !== 'due_soon') return false;
+    if (summaryFilter === 'waiting_you' && !d.needsOfficerAction) return false;
+    if (summaryFilter === 'waiting_others' && d.needsOfficerAction) return false;
+
+    // Search query
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchNum = c.applicationNumber.toLowerCase().includes(q);
+      const matchName = c.institutionName.toLowerCase().includes(q);
+      if (!matchNum && !matchName) return false;
+    }
+
+    // Region
+    if (regionFilter !== 'ALL' && d.region !== regionFilter) return false;
+
+    // Stage
+    if (stageFilter !== 'ALL' && d.stageName !== stageFilter) return false;
+
+    // Waiting on
+    if (waitingFilter !== 'ALL') {
+      if (waitingFilter === 'YOU' && d.ballInCourt !== 'officer') return false;
+      if (waitingFilter === 'COLLEGE' && d.ballInCourt !== 'college') return false;
+      if (waitingFilter === 'COMMITTEE' && d.ballInCourt !== 'committee') return false;
+    }
+
+    return true;
+  };
+
+  // Sort by urgency: overdue -> due_soon -> on_track, then remainingHours ascending
+  const sortByUrgency = (a: CaseSummary, b: CaseSummary) => {
+    const da = derivedMap.get(a.id);
+    const db = derivedMap.get(b.id);
+    if (!da || !db) return 0;
+
+    const rank = (state: ClockState) => {
+      if (state === 'overdue') return 0;
+      if (state === 'due_soon') return 1;
+      if (state === 'on_track') return 2;
+      return 3;
+    };
+
+    const rankDiff = rank(da.clockState) - rank(db.clockState);
+    if (rankDiff !== 0) return rankDiff;
+
+    return da.remainingHours - db.remainingHours;
+  };
+
+  // Action Queue: only cases where needsOfficerAction === true (and not closed)
+  const actionCases = useMemo(() => {
+    return cases
+      .filter(c => {
+        const d = derivedMap.get(c.id);
+        return d && d.needsOfficerAction && !d.isClosed && filterCase(c);
+      })
+      .sort(sortByUrgency);
+  }, [cases, derivedMap, summaryFilter, searchQuery, regionFilter, stageFilter, waitingFilter]);
+
+  // Other Active Cases: active cases waiting on college or committee
+  const otherCases = useMemo(() => {
+    return cases
+      .filter(c => {
+        const d = derivedMap.get(c.id);
+        return d && !d.needsOfficerAction && !d.isClosed && filterCase(c);
+      })
+      .sort(sortByUrgency);
+  }, [cases, derivedMap, summaryFilter, searchQuery, regionFilter, stageFilter, waitingFilter]);
+
+  const activeFiltersCount =
+    (summaryFilter ? 1 : 0) +
+    (regionFilter !== 'ALL' ? 1 : 0) +
+    (stageFilter !== 'ALL' ? 1 : 0) +
+    (waitingFilter !== 'ALL' ? 1 : 0) +
+    (searchQuery.trim() ? 1 : 0);
+
+  const clearFilters = () => {
+    setSummaryFilter(null);
+    setSearchQuery('');
+    setRegionFilter('ALL');
+    setStageFilter('ALL');
+    setWaitingFilter('ALL');
+    setSavedView('MY_QUEUE');
+  };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      {/* Header Banner */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* 1. Header: Page title, context, refresh with time */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
+          alignItems: 'baseline',
           flexWrap: 'wrap',
-          gap: 16,
-          paddingBottom: 4,
+          gap: 12,
+          borderBottom: '1px solid var(--border)',
+          paddingBottom: 12,
         }}
       >
         <div>
-          <h1
-            style={{
-              fontSize: 22,
-              fontWeight: 700,
-              color: 'var(--text-primary)',
-              margin: '0 0 4px',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            Approval Coordination Dashboard
+          <h1 style={{ margin: 0, fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
+            Your queue
           </h1>
-          <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)' }}>
-            Viewing as <strong>{permissions.roleDisplayName}</strong> · Academic Year 2026-27 ·{' '}
-            {selectedRegion === 'ALL' ? 'All Regional Jurisdictions' : `Region ${selectedRegion}`}
+          <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--text-muted)' }}>
+            {permissions.roleDisplayName} · Academic Year 2026-27
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: 10 }}>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={loadDashboardData}
-            leftIcon={<RefreshCw size={13} />}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            onClick={loadData}
+            aria-label="Refresh cases queue"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'transparent',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '4px 8px',
+              fontSize: 12,
+              color: 'var(--text-secondary)',
+              cursor: 'pointer',
+            }}
           >
-            Refresh
-          </Button>
-
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => navigate('/cases')}
-            rightIcon={<ArrowRight size={13} />}
-          >
-            Explore Cases Directory
-          </Button>
+            <RefreshCw size={12} className={loading ? 'animate-spin' : undefined} />
+            <span aria-live="polite" className="tabular-nums" style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              Updated {updatedTime || '--:--'}
+            </span>
+          </button>
         </div>
       </div>
 
-      {/* Error state */}
+      {/* Error alert if load fails */}
       {error && (
         <div
           role="alert"
           style={{
-            padding: 14,
+            padding: '10px 14px',
             background: 'var(--status-bad-tint)',
             color: 'var(--status-bad-text)',
             border: '1px solid var(--status-bad-border)',
-            borderRadius: 8,
+            borderRadius: 'var(--radius-sm)',
             fontSize: 13,
           }}
         >
-          <strong>Error loading dashboard:</strong> {error}
+          {error}
         </div>
       )}
 
-      {/* Loading Skeletons */}
-      {loading && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} style={{ padding: 16, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10 }}>
-                <Skeleton height={14} width="60%" />
-                <div style={{ height: 12 }} />
-                <Skeleton height={32} width="40%" />
-              </div>
-            ))}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 16 }}>
-            <Skeleton height={260} />
-            <Skeleton height={260} />
-          </div>
-        </div>
-      )}
+      {/* Escalation Banner (rendered only if at least one case is overdue) */}
+      <EscalationBanner overdueCases={metrics.lists.overdue} />
 
-      {/* Loaded Dashboard Content */}
-      {!loading && summary && (
-        <>
-          {/* Role Variant 1: Institution Admin View */}
-          {role === 'INSTITUTION_ADMIN' && (
-            <InstitutionDashboardCard primaryCase={cases[0] || null} />
-          )}
-
-          {/* Role Variant 2: EVC Expert View */}
-          {role === 'EVC_EXPERT' && (
-            <ExpertVisitsCard
-              evcCases={cases.filter(
-                c => c.status === 'EVC_PENDING' || c.status === 'EVC_SCHEDULED' || c.status === 'EVC_COMPLETED'
-              )}
-            />
-          )}
-
-          {/* Executive KPI Strip (Shown for Officers and as summary for Institution) */}
-          {role !== 'EVC_EXPERT' && (
-            <ExecutiveKpiStrip summary={summary} role={role} />
-          )}
-
-          {/* Role Variant 3: Regional Officer Escalations Top Priority */}
-          {role === 'REGIONAL_OFFICER' && (
-            <NeedsAttentionQueue cases={cases} role={role} />
-          )}
-
-          {/* Two-Panel Row: Pipeline Funnel + Regulatory Clock Health */}
-          <div
+      {/* 2. Summary Strip: 4 flat clickable filter counts */}
+      <div
+        role="region"
+        aria-label="Queue summary counts"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: 8,
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius-md)',
+          padding: '8px 12px',
+        }}
+      >
+        {/* Count 1: Overdue */}
+        <button
+          onClick={() => setSummaryFilter(prev => (prev === 'overdue' ? null : 'overdue'))}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '6px 8px',
+            borderRadius: 'var(--radius-sm)',
+            border: 0,
+            background: summaryFilter === 'overdue' ? 'var(--bg-subtle)' : 'transparent',
+            cursor: 'pointer',
+            textAlign: 'left',
+          }}
+        >
+          <span
+            className="tabular-nums"
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
-              gap: 16,
-              alignItems: 'stretch',
+              fontSize: 16,
+              fontWeight: 600,
+              color: metrics.counts.overdue > 0 ? 'var(--status-bad-text)' : 'var(--text-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
             }}
           >
-            <PipelineFunnelChart summary={summary} />
-            <RegulatoryClockBar summary={summary} />
-          </div>
+            {metrics.counts.overdue > 0 && <AlertTriangle size={14} style={{ color: 'var(--status-bad)' }} />}
+            {metrics.counts.overdue}
+          </span>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Overdue</span>
+        </button>
 
-          {/* Scrutiny Officer and Standard Role Priority Queue */}
-          {role !== 'REGIONAL_OFFICER' && role !== 'INSTITUTION_ADMIN' && (
-            <NeedsAttentionQueue cases={cases} role={role} />
-          )}
+        {/* Count 2: Due in 48 hours */}
+        <button
+          onClick={() => setSummaryFilter(prev => (prev === 'due_soon' ? null : 'due_soon'))}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '6px 8px',
+            borderRadius: 'var(--radius-sm)',
+            border: 0,
+            background: summaryFilter === 'due_soon' ? 'var(--bg-subtle)' : 'transparent',
+            cursor: 'pointer',
+            textAlign: 'left',
+          }}
+        >
+          <span
+            className="tabular-nums"
+            style={{
+              fontSize: 16,
+              fontWeight: 600,
+              color: metrics.counts.dueSoon > 0 ? 'var(--status-warn-text)' : 'var(--text-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
+            {metrics.counts.dueSoon > 0 && <Clock size={14} style={{ color: 'var(--status-warn)' }} />}
+            {metrics.counts.dueSoon}
+          </span>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Due in 48 hours</span>
+        </button>
 
-          {/* Interactive 5-Column Relationship Topology Section (Cleanly Expandable) */}
-          {primaryCaseDetail && (
-            <div
+        {/* Count 3: Waiting on you */}
+        <button
+          onClick={() => setSummaryFilter(prev => (prev === 'waiting_you' ? null : 'waiting_you'))}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '6px 8px',
+            borderRadius: 'var(--radius-sm)',
+            border: 0,
+            background: summaryFilter === 'waiting_you' ? 'var(--bg-subtle)' : 'transparent',
+            cursor: 'pointer',
+            textAlign: 'left',
+          }}
+        >
+          <span className="tabular-nums" style={{ fontSize: 16, fontWeight: 600, color: 'var(--accent)' }}>
+            {metrics.counts.waitingOnYou}
+          </span>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Waiting on you</span>
+        </button>
+
+        {/* Count 4: Waiting on college / committee */}
+        <button
+          onClick={() => setSummaryFilter(prev => (prev === 'waiting_others' ? null : 'waiting_others'))}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '6px 8px',
+            borderRadius: 'var(--radius-sm)',
+            border: 0,
+            background: summaryFilter === 'waiting_others' ? 'var(--bg-subtle)' : 'transparent',
+            cursor: 'pointer',
+            textAlign: 'left',
+          }}
+        >
+          <span className="tabular-nums" style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
+            {metrics.counts.waitingOnOthers}
+          </span>
+          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Waiting on college/committee</span>
+        </button>
+      </div>
+
+      {/* 3. Filter Row above table */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 8,
+          fontSize: 12,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+          {/* Search-in-table */}
+          <input
+            type="text"
+            placeholder="Filter table rows…"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            style={{
+              padding: '4px 8px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border)',
+              background: 'var(--bg-surface)',
+              color: 'var(--text-primary)',
+              fontSize: 12,
+              width: 170,
+            }}
+          />
+
+          {/* Region filter */}
+          <select
+            value={regionFilter}
+            onChange={e => setRegionFilter(e.target.value)}
+            aria-label="Filter by region"
+            style={{
+              padding: '4px 6px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border)',
+              background: 'var(--bg-surface)',
+              color: 'var(--text-primary)',
+              fontSize: 12,
+              cursor: 'pointer',
+            }}
+          >
+            <option value="ALL">All Regions</option>
+            <option value="WRO">WRO (Western)</option>
+            <option value="SRO">SRO (Southern)</option>
+            <option value="NRO">NRO (Northern)</option>
+            <option value="ERO">ERO (Eastern)</option>
+            <option value="CRO">CRO (Central)</option>
+          </select>
+
+          {/* Stage filter */}
+          <select
+            value={stageFilter}
+            onChange={e => setStageFilter(e.target.value)}
+            aria-label="Filter by stage"
+            style={{
+              padding: '4px 6px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border)',
+              background: 'var(--bg-surface)',
+              color: 'var(--text-primary)',
+              fontSize: 12,
+              cursor: 'pointer',
+            }}
+          >
+            <option value="ALL">All Stages</option>
+            <option value="Intake">1. Intake</option>
+            <option value="Scrutiny">2. Scrutiny</option>
+            <option value="Cure">3. Cure</option>
+            <option value="EVC Visit">4. EVC Visit</option>
+            <option value="Decision">5. Decision</option>
+          </select>
+
+          {/* Waiting on filter */}
+          <select
+            value={waitingFilter}
+            onChange={e => setWaitingFilter(e.target.value)}
+            aria-label="Filter by waiting on"
+            style={{
+              padding: '4px 6px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border)',
+              background: 'var(--bg-surface)',
+              color: 'var(--text-primary)',
+              fontSize: 12,
+              cursor: 'pointer',
+            }}
+          >
+            <option value="ALL">All Responsibility</option>
+            <option value="YOU">Waiting on You</option>
+            <option value="COLLEGE">Waiting on College</option>
+            <option value="COMMITTEE">Waiting on Committee</option>
+          </select>
+
+          {/* Saved Views Dropdown */}
+          <select
+            value={savedView}
+            onChange={e => handleSavedViewChange(e.target.value)}
+            aria-label="Saved views"
+            style={{
+              padding: '4px 6px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border-strong)',
+              background: 'var(--bg-subtle)',
+              color: 'var(--text-primary)',
+              fontSize: 12,
+              fontWeight: 500,
+              cursor: 'pointer',
+            }}
+          >
+            <option value="MY_QUEUE">View: My queue</option>
+            <option value="DUE_THIS_WEEK">View: Due this week</option>
+            <option value="DEFICIENCIES">View: Deficiencies</option>
+            <option value="EVC_PENDING">View: EVC pending</option>
+          </select>
+
+          {/* Removable chips if active filters */}
+          {activeFiltersCount > 0 && (
+            <button
+              onClick={clearFilters}
               style={{
-                background: 'var(--bg-surface)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                padding: '2px 6px',
+                borderRadius: 'var(--radius-sm)',
                 border: '1px solid var(--border)',
-                borderRadius: 10,
-                boxShadow: 'var(--shadow-card)',
-                overflow: 'hidden',
-                transition: 'box-shadow 0.2s ease',
+                background: 'var(--bg-subtle)',
+                color: 'var(--text-muted)',
+                fontSize: 11,
+                cursor: 'pointer',
               }}
             >
-              <div
-                style={{
-                  padding: '16px 22px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                  background: showTopology ? 'var(--bg-subtle)' : 'var(--bg-surface)',
-                  borderBottom: showTopology ? '1px solid var(--border)' : 'none',
-                }}
-                onClick={() => setShowTopology(prev => !prev)}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 8,
-                      background: 'var(--accent-subtle)',
-                      color: 'var(--accent)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Network size={17} />
-                  </div>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
-                      Institutional Relationship Topology · {primaryCaseDetail.applicationNumber}
-                    </h3>
-                    <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--text-secondary)' }}>
-                      5-column statutory compliance dependency trace for {primaryCaseDetail.institution.name}
-                    </p>
-                  </div>
-                </div>
-
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={e => {
-                    e.stopPropagation();
-                    setShowTopology(prev => !prev);
-                  }}
-                >
-                  {showTopology ? 'Hide Topology Graph ▴' : 'Explore Topology Graph ▾'}
-                </Button>
-              </div>
-
-              {showTopology && (
-                <div style={{ padding: 16 }}>
-                  <RelationshipGraphCanvas
-                    data={buildGraphDataFromCase(primaryCaseDetail)}
-                    height={460}
-                    title={`Topological Relationship Graph · ${primaryCaseDetail.applicationNumber}`}
-                    subtitle={`Explorable 5-column statutory compliance dependency map for ${primaryCaseDetail.institution.name}`}
-                    onRefresh={loadDashboardData}
-                  />
-                </div>
-              )}
-            </div>
+              <span>Clear filters ({activeFiltersCount})</span>
+              <X size={11} />
+            </button>
           )}
-        </>
-      )}
+        </div>
+
+        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          Showing <strong style={{ color: 'var(--text-primary)' }}>{actionCases.length}</strong> action items
+        </div>
+      </div>
+
+      {/* 4. Main Table: Needs your action */}
+      <section style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
+            Needs your action
+          </h2>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+            Sorted by urgency · Exactly one primary filled action
+          </span>
+        </div>
+
+        <OfficerCaseTable
+          cases={actionCases}
+          onSelectCase={(c, el) => {
+            setSelectedCase(c);
+            setOriginEl(el || null);
+          }}
+          selectedCaseId={selectedCase?.id}
+          emptyMessage="Nothing needs your action."
+        />
+      </section>
+
+      {/* 5. Secondary Section: Other active cases (collapsed by default) */}
+      <section style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
+        <div
+          onClick={() => setOtherCasesOpen(!otherCasesOpen)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '8px 12px',
+            background: 'var(--bg-subtle)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-sm)',
+            cursor: 'pointer',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {otherCasesOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+              Other active cases ({otherCases.length})
+            </span>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+              — Waiting on college response or expert committee on-site inspection
+            </span>
+          </div>
+
+          <button
+            onClick={e => {
+              e.stopPropagation();
+              navigate('/cases');
+            }}
+            style={{
+              background: 'none',
+              border: 0,
+              color: 'var(--accent)',
+              fontSize: 12,
+              fontWeight: 500,
+              cursor: 'pointer',
+            }}
+          >
+            View all cases →
+          </button>
+        </div>
+
+        {otherCasesOpen && (
+          <OfficerCaseTable
+            cases={otherCases}
+            onSelectCase={(c, el) => {
+              setSelectedCase(c);
+              setOriginEl(el || null);
+            }}
+            selectedCaseId={selectedCase?.id}
+            emptyMessage="No other active cases waiting on external parties."
+            isQuieterSection={true}
+          />
+        )}
+      </section>
+
+      {/* Side Panel for Selected Case */}
+      <CaseSidePanel
+        caseSummary={selectedCase}
+        onClose={() => setSelectedCase(null)}
+        originatingElement={originEl}
+      />
     </div>
   );
 }

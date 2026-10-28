@@ -68,7 +68,7 @@ export function VisitsRoute() {
             Expert Visits &amp; Committee Scheduling
           </h1>
           <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)' }}>
-            Academic expert pool directory, statutory conflict-of-interest eligibility evaluation, and OR-Tools constraint scheduling
+            Expert committee pool, conflict-of-interest eligibility evaluation, and automated visit scheduling.
           </p>
         </div>
       </div>
@@ -77,12 +77,12 @@ export function VisitsRoute() {
       <div
         style={{
           display: 'flex',
-          borderBottom: '1px solid var(--border)',
+          border: '1px solid var(--border)',
           background: 'var(--bg-surface)',
-          borderRadius: 8,
+          borderRadius: 'var(--radius-md)',
           padding: '0 8px',
           overflowX: 'auto',
-          boxShadow: 'var(--shadow-sm)',
+          boxShadow: 'none',
         }}
       >
         <button
@@ -92,28 +92,29 @@ export function VisitsRoute() {
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            padding: '12px 16px',
+            padding: '10px 14px',
             border: 'none',
             background: 'none',
             cursor: 'pointer',
             fontSize: 13,
-            fontWeight: activeTab === 'pool' ? 700 : 500,
+            fontWeight: activeTab === 'pool' ? 600 : 500,
             color: activeTab === 'pool' ? 'var(--accent)' : 'var(--text-secondary)',
-            borderBottom: `2.5px solid ${activeTab === 'pool' ? 'var(--accent)' : 'transparent'}`,
+            borderBottom: `2px solid ${activeTab === 'pool' ? 'var(--accent)' : 'transparent'}`,
             whiteSpace: 'nowrap',
-            transition: 'all 0.15s ease',
+            transition: 'all var(--transition-fast)',
           }}
         >
           <Users size={15} />
           <span>Expert Pool Directory</span>
           <span
+            className="tabular-nums"
             style={{
-              fontSize: 10,
+              fontSize: 11,
               padding: '1px 6px',
-              borderRadius: 10,
+              borderRadius: 'var(--radius-sm)',
               background: activeTab === 'pool' ? 'var(--accent-subtle)' : 'var(--bg-subtle)',
               color: activeTab === 'pool' ? 'var(--accent)' : 'var(--text-muted)',
-              fontWeight: 700,
+              fontWeight: 600,
             }}
           >
             {experts.length}
@@ -127,16 +128,16 @@ export function VisitsRoute() {
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            padding: '12px 16px',
+            padding: '10px 14px',
             border: 'none',
             background: 'none',
             cursor: 'pointer',
             fontSize: 13,
-            fontWeight: activeTab === 'eligibility' ? 700 : 500,
+            fontWeight: activeTab === 'eligibility' ? 600 : 500,
             color: activeTab === 'eligibility' ? 'var(--accent)' : 'var(--text-secondary)',
-            borderBottom: `2.5px solid ${activeTab === 'eligibility' ? 'var(--accent)' : 'transparent'}`,
+            borderBottom: `2px solid ${activeTab === 'eligibility' ? 'var(--accent)' : 'transparent'}`,
             whiteSpace: 'nowrap',
-            transition: 'all 0.15s ease',
+            transition: 'all var(--transition-fast)',
           }}
         >
           <ShieldCheck size={15} />
@@ -150,16 +151,16 @@ export function VisitsRoute() {
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            padding: '12px 16px',
+            padding: '10px 14px',
             border: 'none',
             background: 'none',
             cursor: 'pointer',
             fontSize: 13,
-            fontWeight: activeTab === 'scheduling' ? 700 : 500,
+            fontWeight: activeTab === 'scheduling' ? 600 : 500,
             color: activeTab === 'scheduling' ? 'var(--accent)' : 'var(--text-secondary)',
-            borderBottom: `2.5px solid ${activeTab === 'scheduling' ? 'var(--accent)' : 'transparent'}`,
+            borderBottom: `2px solid ${activeTab === 'scheduling' ? 'var(--accent)' : 'transparent'}`,
             whiteSpace: 'nowrap',
-            transition: 'all 0.15s ease',
+            transition: 'all var(--transition-fast)',
           }}
         >
           <Calendar size={15} />

@@ -72,7 +72,7 @@ export function DeficienciesPaneLeft({
                   color: 'var(--status-bad-text)',
                   border: '1px solid var(--status-bad-border)',
                   padding: '2px 6px',
-                  borderRadius: 10,
+                  borderRadius: 'var(--radius-sm)',
                   fontWeight: 700,
                 }}
               >
@@ -86,7 +86,7 @@ export function DeficienciesPaneLeft({
                   color: 'var(--status-info-text)',
                   border: '1px solid var(--status-info-border)',
                   padding: '2px 6px',
-                  borderRadius: 10,
+                  borderRadius: 'var(--radius-sm)',
                   fontWeight: 700,
                 }}
               >

@@ -13,6 +13,10 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      const urlTheme = new URLSearchParams(window.location.search).get('theme');
+      if (urlTheme === 'light' || urlTheme === 'dark') return urlTheme;
+    }
     const saved = getStoredItem('aicte_theme');
     if (saved === 'dark' || saved === 'light') return saved;
     if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {

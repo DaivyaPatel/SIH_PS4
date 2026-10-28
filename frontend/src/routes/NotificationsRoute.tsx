@@ -204,14 +204,14 @@ export function NotificationsRoute() {
             style={{
               background: 'var(--bg-surface)',
               border: '1px solid var(--border)',
-              borderRadius: 8,
-              padding: '14px 16px',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
             }}
           >
             <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
               Total Ledger
             </div>
-            <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>
+            <div className="tabular-nums" style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>
               {summary.total}
             </div>
           </div>
@@ -220,14 +220,14 @@ export function NotificationsRoute() {
             style={{
               background: 'var(--bg-surface)',
               border: `1px solid ${summary.unread > 0 ? 'var(--accent-border)' : 'var(--border)'}`,
-              borderRadius: 8,
-              padding: '14px 16px',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
             }}
           >
             <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
               Unread Notices
             </div>
-            <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 700, color: summary.unread > 0 ? 'var(--accent)' : 'var(--text-primary)', marginTop: 4 }}>
+            <div className="tabular-nums" style={{ fontSize: 20, fontWeight: 700, color: summary.unread > 0 ? 'var(--accent)' : 'var(--text-primary)', marginTop: 4 }}>
               {summary.unread}
             </div>
           </div>
@@ -236,14 +236,14 @@ export function NotificationsRoute() {
             style={{
               background: summary.escalations > 0 ? 'var(--status-bad-tint)' : 'var(--bg-surface)',
               border: `1px solid ${summary.escalations > 0 ? 'var(--status-bad-border)' : 'var(--border)'}`,
-              borderRadius: 8,
-              padding: '14px 16px',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
             }}
           >
             <div style={{ fontSize: 11, fontWeight: 600, color: summary.escalations > 0 ? 'var(--status-bad-text)' : 'var(--text-muted)', textTransform: 'uppercase' }}>
               SLA Escalations
             </div>
-            <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 700, color: summary.escalations > 0 ? 'var(--status-bad-text)' : 'var(--text-primary)', marginTop: 4 }}>
+            <div className="tabular-nums" style={{ fontSize: 20, fontWeight: 700, color: summary.escalations > 0 ? 'var(--status-bad-text)' : 'var(--text-primary)', marginTop: 4 }}>
               {summary.escalations}
             </div>
           </div>
@@ -252,14 +252,14 @@ export function NotificationsRoute() {
             style={{
               background: 'var(--bg-surface)',
               border: '1px solid var(--border)',
-              borderRadius: 8,
-              padding: '14px 16px',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
             }}
           >
             <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
               Deficiency Flags
             </div>
-            <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>
+            <div className="tabular-nums" style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>
               {summary.deficiencyNotices}
             </div>
           </div>
@@ -268,14 +268,14 @@ export function NotificationsRoute() {
             style={{
               background: 'var(--bg-surface)',
               border: '1px solid var(--border)',
-              borderRadius: 8,
-              padding: '14px 16px',
+              borderRadius: 'var(--radius-md)',
+              padding: '12px 14px',
             }}
           >
             <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
               Inspection Visits
             </div>
-            <div className="tabular-nums" style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>
+            <div className="tabular-nums" style={{ fontSize: 20, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>
               {summary.inspectionAppointments}
             </div>
           </div>

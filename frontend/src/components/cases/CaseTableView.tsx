@@ -4,7 +4,6 @@ import { ArrowUpDown, ArrowUp, ArrowDown, ArrowRight, Download, CheckSquare, Squ
 import type { CaseSummary } from '../../types/domain';
 import { StatusChip } from '../common/StatusChip';
 import { DeadlineChip } from '../common/DeadlineChip';
-import { ReadinessRing } from '../common/ReadinessRing';
 import { Button } from '../common/Button';
 import { EmptyState } from '../common/EmptyState';
 
@@ -81,7 +80,7 @@ export function CaseTableView({ cases, density, onExportCases }: CaseTableViewPr
     onExportCases(selectedCases);
   };
 
-  const padCell = density === 'comfortable' ? '12px 14px' : '6px 10px';
+  const padCell = density === 'comfortable' ? '10px 12px' : '6px 10px';
   const fontSize = density === 'comfortable' ? 13 : 12;
 
   if (cases.length === 0) {
@@ -116,13 +115,12 @@ export function CaseTableView({ cases, density, onExportCases }: CaseTableViewPr
             justifyContent: 'space-between',
             background: 'var(--accent-subtle)',
             border: '1px solid var(--accent)',
-            borderRadius: 6,
+            borderRadius: 'var(--radius-md)',
             padding: '8px 14px',
-            animation: 'fadeIn 0.2s ease',
           }}
         >
           <div style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 600 }}>
-            {selectedIds.size} case{selectedIds.size > 1 ? 's' : ''} selected
+            <span className="tabular-nums">{selectedIds.size}</span> case{selectedIds.size > 1 ? 's' : ''} selected
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <Button
@@ -146,12 +144,13 @@ export function CaseTableView({ cases, density, onExportCases }: CaseTableViewPr
 
       {/* Table Container */}
       <div
+        className={`table-container density-${density}`}
         style={{
           background: 'var(--bg-surface)',
           border: '1px solid var(--border)',
-          borderRadius: 8,
+          borderRadius: 'var(--radius-md)',
           overflowX: 'auto',
-          boxShadow: 'var(--shadow-sm)',
+          boxShadow: 'none',
         }}
       >
         <table
@@ -162,7 +161,7 @@ export function CaseTableView({ cases, density, onExportCases }: CaseTableViewPr
             fontSize,
           }}
         >
-          <thead>
+          <thead style={{ position: 'sticky', top: 0, zIndex: 2 }}>
             <tr
               style={{
                 background: 'var(--bg-subtle)',
@@ -219,14 +218,14 @@ export function CaseTableView({ cases, density, onExportCases }: CaseTableViewPr
                 </div>
               </th>
 
-              <th style={{ padding: padCell, width: 80 }}>Region</th>
-              <th style={{ padding: padCell, width: 140 }}>Stage</th>
+              <th style={{ padding: padCell, width: 70 }}>Region</th>
+              <th style={{ padding: padCell, width: 140 }}>Status</th>
 
               <th
                 onClick={() => handleSort('readinessScore')}
-                style={{ padding: padCell, cursor: 'pointer', width: 130 }}
+                style={{ padding: padCell, cursor: 'pointer', width: 110, textAlign: 'right' }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6 }}>
                   <span>Readiness</span>
                   {renderSortIndicator('readinessScore')}
                 </div>
@@ -234,7 +233,7 @@ export function CaseTableView({ cases, density, onExportCases }: CaseTableViewPr
 
               <th
                 onClick={() => handleSort('remainingHours')}
-                style={{ padding: padCell, cursor: 'pointer', width: 130 }}
+                style={{ padding: padCell, cursor: 'pointer', width: 140 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span>Deadline</span>
@@ -250,14 +249,20 @@ export function CaseTableView({ cases, density, onExportCases }: CaseTableViewPr
           <tbody>
             {sortedCases.map(c => {
               const isSelected = selectedIds.has(c.id);
+              const isClosed = c.status === 'APPROVED' || c.status === 'REJECTED';
 
               return (
                 <tr
                   key={c.id}
+                  onClick={e => {
+                    if ((e.target as HTMLElement).closest('button, input, a')) return;
+                    navigate(`/cases/${c.id}`);
+                  }}
                   style={{
                     borderBottom: '1px solid var(--border)',
                     background: isSelected ? 'var(--accent-subtle)' : 'transparent',
-                    transition: 'background 0.15s ease',
+                    cursor: 'pointer',
+                    transition: 'background var(--transition-fast)',
                   }}
                   onMouseEnter={e => {
                     if (!isSelected) {
@@ -274,7 +279,10 @@ export function CaseTableView({ cases, density, onExportCases }: CaseTableViewPr
                   <td style={{ padding: padCell, textAlign: 'center' }}>
                     <button
                       type="button"
-                      onClick={() => toggleSelectOne(c.id)}
+                      onClick={e => {
+                        e.stopPropagation();
+                        toggleSelectOne(c.id);
+                      }}
                       style={{
                         background: 'none',
                         border: 'none',
@@ -296,23 +304,16 @@ export function CaseTableView({ cases, density, onExportCases }: CaseTableViewPr
 
                   {/* Application Number */}
                   <td style={{ padding: padCell }}>
-                    <button
-                      onClick={() => navigate(`/cases/${c.id}`)}
+                    <span
                       style={{
-                        background: 'none',
-                        border: 'none',
-                        padding: 0,
-                        cursor: 'pointer',
                         fontFamily: 'monospace',
                         fontWeight: 600,
                         color: 'var(--accent)',
                         fontSize: fontSize + 1,
-                        textDecoration: 'underline',
-                        textUnderlineOffset: 3,
                       }}
                     >
                       {c.applicationNumber}
-                    </button>
+                    </span>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
                       AY {c.academicYear}
                     </div>
@@ -333,9 +334,9 @@ export function CaseTableView({ cases, density, onExportCases }: CaseTableViewPr
                     <span
                       style={{
                         fontSize: 11,
-                        fontWeight: 700,
-                        padding: '2px 8px',
-                        borderRadius: 4,
+                        fontWeight: 600,
+                        padding: '2px 6px',
+                        borderRadius: 'var(--radius-sm)',
                         background: 'var(--bg-subtle)',
                         border: '1px solid var(--border)',
                         color: 'var(--text-secondary)',
@@ -345,76 +346,72 @@ export function CaseTableView({ cases, density, onExportCases }: CaseTableViewPr
                     </span>
                   </td>
 
-                  {/* Stage */}
+                  {/* Status */}
                   <td style={{ padding: padCell }}>
                     <StatusChip status={c.status} size="sm" />
                   </td>
 
-                  {/* Readiness Ring */}
-                  <td style={{ padding: padCell }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <ReadinessRing score={c.readinessScore} size="sm" showLabel={false} />
-                      <span className="tabular-nums" style={{ fontWeight: 600, fontSize: 12 }}>
+                  {/* Readiness Bar */}
+                  <td style={{ padding: padCell, textAlign: 'right' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3, maxWidth: 80, marginLeft: 'auto' }}>
+                      <span className="tabular-nums" style={{ fontWeight: 600, fontSize: 12, color: 'var(--text-primary)' }}>
                         {c.readinessScore}%
                       </span>
+                      <div style={{ width: '100%', height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
+                        <div
+                          style={{
+                            width: `${c.readinessScore}%`,
+                            height: '100%',
+                            background:
+                              c.readinessScore >= 80
+                                ? 'var(--status-ok)'
+                                : c.readinessScore >= 50
+                                ? 'var(--status-warn)'
+                                : 'var(--status-bad)',
+                          }}
+                        />
+                      </div>
                     </div>
                   </td>
 
-                  {/* Deadline */}
+                  {/* Deadline: Decided date if closed, else countdown */}
                   <td style={{ padding: padCell }}>
-                    <DeadlineChip
-                      isOverdue={c.isOverdue}
-                      remainingHours={c.remainingHours}
-                      remainingBusinessDays={c.remainingBusinessDays}
-                      deadlineStatus={c.deadlineStatus}
-                      deadlineAtIst={c.deadlineAtIst}
-                      size="sm"
-                    />
+                    {isClosed ? (
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                        Decided {new Date(c.updatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </div>
+                    ) : (
+                      <DeadlineChip
+                        isOverdue={c.isOverdue}
+                        remainingHours={c.remainingHours}
+                        remainingBusinessDays={c.remainingBusinessDays}
+                        deadlineStatus={c.deadlineStatus}
+                        deadlineAtIst={c.deadlineAtIst}
+                        size="sm"
+                      />
+                    )}
                   </td>
 
                   {/* Assigned Officer */}
                   <td style={{ padding: padCell }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                      <div
-                        style={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: '50%',
-                          background: 'var(--accent-subtle)',
-                          color: 'var(--accent)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: 10,
-                          fontWeight: 700,
-                          flexShrink: 0,
-                        }}
-                      >
-                        {c.assignedOfficer
-                          ? c.assignedOfficer
-                              .split(' ')
-                              .map(part => part[0])
-                              .join('')
-                              .slice(0, 2)
-                              .toUpperCase()
-                          : 'NA'}
-                      </div>
-                      <span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>
-                        {c.assignedOfficer || 'Unassigned'}
-                      </span>
-                    </div>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: 12 }}>
+                      {c.assignedOfficer || 'Unassigned'}
+                    </span>
                   </td>
 
                   {/* Action Link */}
                   <td style={{ padding: padCell, textAlign: 'center' }}>
                     <button
-                      onClick={() => navigate(`/cases/${c.id}`)}
+                      onClick={e => {
+                        e.stopPropagation();
+                        navigate(`/cases/${c.id}`);
+                      }}
                       style={{
                         background: 'none',
                         border: 'none',
                         cursor: 'pointer',
                         padding: 4,
-                        borderRadius: 4,
+                        borderRadius: 'var(--radius-sm)',
                         color: 'var(--text-muted)',
                         display: 'flex',
                         alignItems: 'center',

@@ -5,6 +5,7 @@ import type {
   ExpertDetail,
   NotificationRecord,
 } from '../types/domain';
+import { deriveCaseState, computeUnifiedMetrics } from '../lib/caseLogic';
 
 export const DEMO_CASES: CaseDetail[] = [
   {
@@ -439,6 +440,7 @@ export const DEMO_NOTIFICATIONS: NotificationRecord[] = [
 ];
 
 export function toCaseSummary(detail: CaseDetail): CaseSummary {
+  const derived = deriveCaseState(detail);
   return {
     id: detail.id,
     applicationNumber: detail.applicationNumber,
@@ -455,23 +457,20 @@ export function toCaseSummary(detail: CaseDetail): CaseSummary {
     deadlineAt: detail.deadlineAt,
     submittedAt: detail.submittedAt,
     updatedAt: detail.updatedAt,
-    isOverdue: detail.isOverdue,
-    remainingHours: detail.remainingHours,
-    remainingBusinessDays: detail.remainingBusinessDays,
-    deadlineStatus: detail.deadlineStatus,
-    deadlineAtIst: detail.deadlineAtIst,
+    isOverdue: derived.clockState === 'overdue',
+    remainingHours: derived.remainingHours,
+    remainingBusinessDays: Math.max(0, Math.ceil(derived.remainingHours / 24)),
+    deadlineStatus: derived.clockState === 'overdue' ? 'OVERDUE' : derived.clockState === 'due_soon' ? 'APPROACHING_DEADLINE' : 'ON_TRACK',
+    deadlineAtIst: derived.nextDeadlineIst,
   };
 }
 
 export function buildDashboardSummary(cases: CaseDetail[]): DashboardSummary {
+  const metrics = computeUnifiedMetrics(cases);
   const total = cases.length;
-  const approved = cases.filter(c => c.status === 'APPROVED').length;
-  const rejected = cases.filter(c => c.status === 'REJECTED').length;
   const scrutiny = cases.filter(c => c.status === 'UNDER_SCRUTINY').length;
   const def = cases.filter(c => c.status === 'DEFICIENCY_FLAGGED' || c.status === 'DEFICIENCY_RESUBMITTED').length;
   const evc = cases.filter(c => c.status === 'EVC_PENDING' || c.status === 'EVC_SCHEDULED').length;
-  const escalations = cases.filter(c => c.isOverdue || c.deadlineStatus === 'APPROACHING_DEADLINE').length;
-  const avgReadiness = Math.round(cases.reduce((sum, c) => sum + c.readinessScore, 0) / Math.max(1, total));
 
   const statusDist: Record<string, number> = {};
   const regionDist: Record<string, number> = {};
@@ -489,10 +488,10 @@ export function buildDashboardSummary(cases: CaseDetail[]): DashboardSummary {
       pendingScrutiny: scrutiny,
       openDeficiencies: def,
       scheduledInspections: evc,
-      approvedCount: approved,
-      rejectedCount: rejected,
-      criticalEscalations: escalations,
-      averageReadinessScore: avgReadiness,
+      approvedCount: metrics.counts.approved,
+      rejectedCount: metrics.counts.rejected,
+      criticalEscalations: metrics.counts.overdue,
+      averageReadinessScore: metrics.counts.averageReadiness,
     },
     compliance: {
       totalCases: total,
@@ -511,10 +510,10 @@ export function buildDashboardSummary(cases: CaseDetail[]): DashboardSummary {
       defaultCommitteeSize: 3,
     },
     clocks: {
-      onTrack: cases.filter(c => c.deadlineStatus === 'ON_TRACK').length,
-      approachingDeadline: cases.filter(c => c.deadlineStatus === 'APPROACHING_DEADLINE').length,
-      overdueBreached: cases.filter(c => c.deadlineStatus === 'OVERDUE').length,
-      totalEscalationsDispatched: escalations,
+      onTrack: metrics.counts.onTrack,
+      approachingDeadline: metrics.counts.dueSoon,
+      overdueBreached: metrics.counts.overdue,
+      totalEscalationsDispatched: metrics.counts.overdue,
     },
     statusDistribution: statusDist,
     regionalDistribution: regionDist,

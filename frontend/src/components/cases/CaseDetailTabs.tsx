@@ -90,7 +90,7 @@ export function CaseDetailTabs({
     { label: 'Timeline', icon: Clock },
     { label: 'Audit Trail', icon: ShieldCheck },
     { label: 'Expert Committee', icon: Users },
-    { label: 'Relationships', icon: Network },
+    { label: 'Dependencies', icon: Network },
   ];
 
   const graphData = useMemo(() => buildGraphDataFromCase(caseData), [caseData]);
@@ -696,15 +696,25 @@ export function CaseDetailTabs({
         <CaseExpertVisitCard caseData={caseData} />
       )}
 
-      {/* Tab 6: Relationships */}
+      {/* Tab 6: Dependencies (Topology Graph) */}
       {activeTab === 6 && (
-        <RelationshipGraphCanvas
-          data={graphData}
-          height={540}
-          title={`Topological Relationship Graph — ${caseData.applicationNumber}`}
-          subtitle={`Tracing statutory compliance neighbourhood for ${caseData.institution.name}`}
-          onRefresh={onRefresh}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 8 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, margin: '0 0 4px', color: 'var(--text-primary)' }}>
+              What this case depends on
+            </h3>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
+              Statutory prerequisite chains, document dependencies, and compliance topology.
+            </p>
+          </div>
+          <RelationshipGraphCanvas
+            data={graphData}
+            height={540}
+            title={`Topological Relationship Graph — ${caseData.applicationNumber}`}
+            subtitle={`Tracing statutory compliance neighbourhood for ${caseData.institution.name}`}
+            onRefresh={onRefresh}
+          />
+        </div>
       )}
     </div>
   );
