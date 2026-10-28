@@ -20,76 +20,86 @@
   --accent-border: #bfdbfe;
 
   /* Status Tokens */
+  --status-ok: #16a34a;
   --status-ok-solid: #16a34a;
-  --status-ok-tint: #dcfce7;
-  --status-ok-text: #15803d;
-  --status-ok-border: #bbf7d0;
+  --status-ok-tint: #ecfdf5;
+  --status-ok-text: #047857;
+  --status-ok-border: #a7f3d0;
 
+  --status-warn: #d97706;
   --status-warn-solid: #d97706;
-  --status-warn-tint: #fef3c7;
+  --status-warn-tint: #fffbeb;
   --status-warn-text: #b45309;
   --status-warn-border: #fde68a;
 
+  --status-bad: #dc2626;
   --status-bad-solid: #dc2626;
-  --status-bad-tint: #fee2e2;
+  --status-bad-tint: #fef2f2;
   --status-bad-text: #b91c1c;
   --status-bad-border: #fecaca;
 
+  --status-info: #0284c7;
   --status-info-solid: #0284c7;
-  --status-info-tint: #e0f2fe;
+  --status-info-tint: #f0f9ff;
   --status-info-text: #0369a1;
   --status-info-border: #bae6fd;
 
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
 
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  --bg-page: #0b0f19;
-  --bg-surface: #111827;
-  --bg-subtle: #1e293b;
-  --bg-hover: #334155;
-  --border: #1f2937;
-  --border-strong: #374151;
+  --bg-page: #090d16;
+  --bg-surface: #101623;
+  --bg-subtle: #172033;
+  --bg-hover: #1e2a42;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
   --border-focus: #3b82f6;
 
   --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --text-inverse: #0f172a;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-inverse: #090d16;
 
   --accent: #3b82f6;
   --accent-hover: #60a5fa;
-  --accent-subtle: #1e3a8a33;
-  --accent-border: #1e40af;
+  --accent-subtle: rgba(59, 130, 246, 0.12);
+  --accent-border: rgba(59, 130, 246, 0.3);
 
   /* Status Tokens */
-  --status-ok-solid: #22c55e;
-  --status-ok-tint: #14532d3d;
-  --status-ok-text: #4ade80;
-  --status-ok-border: #166534;
+  --status-ok: #10b981;
+  --status-ok-solid: #10b981;
+  --status-ok-tint: rgba(16, 185, 129, 0.12);
+  --status-ok-text: #34d399;
+  --status-ok-border: rgba(16, 185, 129, 0.25);
 
+  --status-warn: #f59e0b;
   --status-warn-solid: #f59e0b;
-  --status-warn-tint: #78350f3d;
+  --status-warn-tint: rgba(245, 158, 11, 0.12);
   --status-warn-text: #fbbf24;
-  --status-warn-border: #92400e;
+  --status-warn-border: rgba(245, 158, 11, 0.25);
 
+  --status-bad: #ef4444;
   --status-bad-solid: #ef4444;
-  --status-bad-tint: #7f1d1d3d;
+  --status-bad-tint: rgba(239, 68, 68, 0.12);
   --status-bad-text: #f87171;
-  --status-bad-border: #991b1b;
+  --status-bad-border: rgba(239, 68, 68, 0.25);
 
-  --status-info-solid: #38bdf8;
-  --status-info-tint: #0c4a6e3d;
-  --status-info-text: #7dd3fc;
-  --status-info-border: #0369a1;
+  --status-info: #0ea5e9;
+  --status-info-solid: #0ea5e9;
+  --status-info-tint: rgba(14, 165, 233, 0.12);
+  --status-info-text: #38bdf8;
+  --status-info-border: rgba(14, 165, 233, 0.25);
 
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
 
   color-scheme: dark;
 }
@@ -100,13 +110,14 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 14px;
   line-height: 1.5;
   color: var(--text-primary);
   background-color: var(--bg-page);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Tabular numerals for alignment */

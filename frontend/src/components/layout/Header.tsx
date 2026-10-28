@@ -68,32 +68,42 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 24px',
+        padding: '0 32px',
         position: 'sticky',
         top: 0,
         zIndex: 40,
+        boxShadow: 'var(--shadow-sm)',
       }}
     >
-      {/* Search Input trigger */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      {/* Left: Quick Search trigger & Simulation Pill */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <button
           onClick={() => (onOpenPalette ? onOpenPalette() : navigate('/cases'))}
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 8,
-            padding: '7px 12px',
+            gap: 10,
+            padding: '6px 14px',
             background: 'var(--bg-subtle)',
             border: '1px solid var(--border)',
-            borderRadius: 6,
+            borderRadius: 8,
             color: 'var(--text-secondary)',
             fontSize: 13,
             cursor: 'pointer',
-            minWidth: 260,
+            minWidth: 280,
+            transition: 'border-color 0.15s ease, background 0.15s ease',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.borderColor = 'var(--border-strong)';
+            e.currentTarget.style.background = 'var(--bg-hover)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.borderColor = 'var(--border)';
+            e.currentTarget.style.background = 'var(--bg-subtle)';
           }}
         >
-          <Search size={15} />
-          <span style={{ flex: 1, textAlign: 'left' }}>Search cases or colleges…</span>
+          <Search size={14} style={{ color: 'var(--text-muted)' }} />
+          <span style={{ flex: 1, textAlign: 'left', color: 'var(--text-muted)' }}>Search cases, colleges, stages…</span>
           <kbd
             style={{
               fontSize: 11,
@@ -101,32 +111,71 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
               background: 'var(--bg-surface)',
               border: '1px solid var(--border)',
               borderRadius: 4,
-              padding: '1px 5px',
+              padding: '1px 6px',
+              color: 'var(--text-secondary)',
             }}
           >
             ⌘K
           </kbd>
         </button>
+
+        {/* Live Simulation Indicator Pill */}
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontSize: 11,
+            fontWeight: 500,
+            padding: '3px 10px',
+            borderRadius: 9999,
+            background: 'var(--status-ok-tint)',
+            color: 'var(--status-ok-text)',
+            border: '1px solid var(--status-ok-border)',
+          }}
+        >
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: 'var(--status-ok-solid)',
+              display: 'inline-block',
+            }}
+          />
+          Live Simulated · IST
+        </span>
       </div>
 
-      {/* Global Context Pickers & Utilities */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+      {/* Right: Global Context Pickers & Utilities */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         {/* Region Selector */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Globe size={15} style={{ color: 'var(--text-muted)' }} />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '3px 8px',
+            borderRadius: 8,
+            background: 'var(--bg-subtle)',
+            border: '1px solid var(--border)',
+          }}
+        >
+          <Globe size={13} style={{ color: 'var(--text-muted)' }} />
           <select
             value={selectedRegion}
             onChange={e => setSelectedRegion(e.target.value as (typeof regions)[number])}
             aria-label="Filter by region"
             style={{
-              padding: '6px 10px',
-              borderRadius: 6,
+              padding: '3px 4px',
+              borderRadius: 4,
               fontSize: 12,
               fontWeight: 500,
-              background: 'var(--bg-surface)',
+              background: 'transparent',
               color: 'var(--text-primary)',
-              border: '1px solid var(--border)',
+              border: 'none',
               cursor: 'pointer',
+              outline: 'none',
             }}
           >
             {regions.map(r => (
@@ -138,21 +187,32 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
         </div>
 
         {/* Role Switcher */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <UserCheck size={15} style={{ color: 'var(--text-muted)' }} />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '3px 8px',
+            borderRadius: 8,
+            background: 'var(--accent-subtle)',
+            border: '1px solid var(--accent-border)',
+          }}
+        >
+          <UserCheck size={13} style={{ color: 'var(--accent)' }} />
           <select
             value={role}
             onChange={e => setRole(e.target.value as Role)}
             aria-label="Switch active role"
             style={{
-              padding: '6px 10px',
-              borderRadius: 6,
+              padding: '3px 4px',
+              borderRadius: 4,
               fontSize: 12,
               fontWeight: 600,
-              background: 'var(--accent-subtle)',
+              background: 'transparent',
               color: 'var(--accent)',
-              border: '1px solid var(--accent-border)',
+              border: 'none',
               cursor: 'pointer',
+              outline: 'none',
             }}
           >
             {roles.map(r => (
@@ -163,7 +223,7 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
           </select>
         </div>
 
-        <div style={{ width: 1, height: 24, background: 'var(--border)' }} />
+        <div style={{ width: 1, height: 20, background: 'var(--border)', margin: '0 2px' }} />
 
         {/* Notification Bell Dropdown */}
         <div style={{ position: 'relative' }} ref={dropdownRef}>
@@ -171,24 +231,25 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
             onClick={() => setBellOpen(!bellOpen)}
             aria-label="Notifications"
             style={{
-              background: 'transparent',
-              border: 0,
+              background: bellOpen ? 'var(--bg-subtle)' : 'transparent',
+              border: '1px solid var(--border)',
               color: 'var(--text-secondary)',
               cursor: 'pointer',
-              padding: 6,
-              borderRadius: 6,
+              padding: '7px 8px',
+              borderRadius: 8,
               display: 'flex',
               alignItems: 'center',
               position: 'relative',
+              transition: 'background 0.15s ease',
             }}
           >
-            <Bell size={18} />
+            <Bell size={16} />
             {unreadCount > 0 && (
               <span
                 style={{
                   position: 'absolute',
-                  top: 2,
-                  right: 2,
+                  top: -3,
+                  right: -3,
                   minWidth: 16,
                   height: 16,
                   borderRadius: 8,
@@ -212,14 +273,14 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
             <div
               style={{
                 position: 'absolute',
-                top: 36,
+                top: 40,
                 right: 0,
                 width: 320,
                 background: 'var(--bg-surface)',
                 border: '1px solid var(--border)',
-                borderRadius: 8,
+                borderRadius: 10,
                 boxShadow: 'var(--shadow-lg)',
-                padding: 12,
+                padding: 14,
                 zIndex: 100,
               }}
             >
@@ -228,12 +289,12 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  marginBottom: 8,
-                  paddingBottom: 6,
+                  marginBottom: 10,
+                  paddingBottom: 8,
                   borderBottom: '1px solid var(--border)',
                 }}
               >
-                <span style={{ fontSize: 13, fontWeight: 600 }}>Recent Notifications</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Notifications</span>
                 <button
                   onClick={() => {
                     setBellOpen(false);
@@ -244,16 +305,17 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
                     border: 0,
                     color: 'var(--accent)',
                     fontSize: 12,
+                    fontWeight: 600,
                     cursor: 'pointer',
                   }}
                 >
-                  View all
+                  View inbox
                 </button>
               </div>
 
               {recentNotifs.length === 0 ? (
-                <div style={{ padding: '16px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>
-                  No recent notifications
+                <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: 12 }}>
+                  All statutory notifications acknowledged
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -266,12 +328,15 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
                         else navigate('/notifications');
                       }}
                       style={{
-                        padding: '6px 8px',
+                        padding: '8px 10px',
                         borderRadius: 6,
                         background: 'var(--bg-subtle)',
                         fontSize: 12,
                         cursor: 'pointer',
+                        transition: 'background 0.15s ease',
                       }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-hover)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'var(--bg-subtle)')}
                     >
                       <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{n.title}</div>
                       <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>
@@ -291,16 +356,19 @@ export function Header({ onOpenPalette }: HeaderProps = {}) {
           aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           style={{
             background: 'transparent',
-            border: 0,
+            border: '1px solid var(--border)',
             color: 'var(--text-secondary)',
             cursor: 'pointer',
-            padding: 6,
-            borderRadius: 6,
+            padding: '7px 8px',
+            borderRadius: 8,
             display: 'flex',
             alignItems: 'center',
+            transition: 'background 0.15s ease',
           }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-subtle)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
         >
-          {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+          {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
         </button>
       </div>
     </header>

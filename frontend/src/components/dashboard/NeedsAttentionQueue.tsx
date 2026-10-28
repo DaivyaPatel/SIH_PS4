@@ -50,12 +50,12 @@ export function NeedsAttentionQueue({ cases, role }: NeedsAttentionQueueProps) {
       style={{
         background: 'var(--bg-surface)',
         border: '1px solid var(--border)',
-        borderRadius: 8,
-        padding: '18px 20px',
-        boxShadow: 'var(--shadow-sm)',
+        borderRadius: 10,
+        padding: '20px 22px',
+        boxShadow: 'var(--shadow-card)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 14,
+        gap: 16,
       }}
     >
       {/* Header */}
@@ -105,22 +105,25 @@ export function NeedsAttentionQueue({ cases, role }: NeedsAttentionQueueProps) {
                 key={c.id}
                 onClick={() => navigate(`/cases/${c.id}`)}
                 style={{
-                  background: c.isOverdue ? 'var(--status-bad-tint)' : 'var(--bg-page)',
+                  background: c.isOverdue ? 'var(--status-bad-tint)' : 'var(--bg-subtle)',
                   border: `1px solid ${c.isOverdue ? 'var(--status-bad-border)' : 'var(--border)'}`,
-                  borderRadius: 6,
-                  padding: '10px 14px',
+                  borderLeft: c.isOverdue ? '3px solid var(--status-bad-solid)' : '3px solid transparent',
+                  borderRadius: 8,
+                  padding: '11px 16px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  gap: 12,
+                  gap: 14,
                   cursor: 'pointer',
-                  transition: 'background 0.15s ease, border-color 0.15s ease',
+                  transition: 'background 0.15s ease, border-color 0.15s ease, transform 0.15s ease',
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.borderColor = 'var(--accent)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.borderColor = c.isOverdue ? 'var(--status-bad-border)' : 'var(--border)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 {/* Left: App Number & Institution */}
@@ -139,11 +142,12 @@ export function NeedsAttentionQueue({ cases, role }: NeedsAttentionQueueProps) {
                     <span
                       style={{
                         fontSize: 10,
-                        fontWeight: 700,
-                        padding: '1px 5px',
-                        borderRadius: 3,
-                        background: 'var(--bg-subtle)',
+                        fontWeight: 600,
+                        padding: '1px 6px',
+                        borderRadius: 4,
+                        background: 'var(--bg-surface)',
                         color: 'var(--text-secondary)',
+                        border: '1px solid var(--border)',
                       }}
                     >
                       {c.region}
@@ -155,7 +159,7 @@ export function NeedsAttentionQueue({ cases, role }: NeedsAttentionQueueProps) {
                       fontSize: 13,
                       fontWeight: 600,
                       color: 'var(--text-primary)',
-                      marginTop: 2,
+                      marginTop: 3,
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -170,7 +174,7 @@ export function NeedsAttentionQueue({ cases, role }: NeedsAttentionQueueProps) {
                   <StatusChip status={c.status} size="sm" />
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: 80 }}>
                     <ReadinessRing score={c.readinessScore} size="sm" showLabel={false} />
-                    <span className="tabular-nums" style={{ fontSize: 11, fontWeight: 700 }}>
+                    <span className="tabular-nums" style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)' }}>
                       {c.readinessScore}%
                     </span>
                   </div>

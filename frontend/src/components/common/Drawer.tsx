@@ -13,6 +13,7 @@ interface DrawerProps {
 
 export function Drawer({ isOpen, onClose, title, subtitle, children, width, size = 'md' }: DrawerProps) {
   const effectiveWidth = width || (size === 'sm' ? 360 : size === 'lg' ? 580 : 440);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -49,8 +50,8 @@ export function Drawer({ isOpen, onClose, title, subtitle, children, width, size
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'rgba(0, 0, 0, 0.4)',
-          backdropFilter: 'blur(1px)',
+          background: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(3px)',
         }}
       />
       {/* Slide-over panel */}
@@ -66,7 +67,7 @@ export function Drawer({ isOpen, onClose, title, subtitle, children, width, size
           display: 'flex',
           flexDirection: 'column',
           zIndex: 1001,
-          animation: 'slideInRight 0.2s ease-out',
+          animation: 'slideInRight 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
         <div
@@ -74,12 +75,12 @@ export function Drawer({ isOpen, onClose, title, subtitle, children, width, size
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '16px 20px',
+            padding: '18px 24px',
             borderBottom: '1px solid var(--border)',
           }}
         >
           <div>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
               {title}
             </h3>
             {subtitle && (
@@ -96,16 +97,19 @@ export function Drawer({ isOpen, onClose, title, subtitle, children, width, size
               border: 0,
               color: 'var(--text-secondary)',
               cursor: 'pointer',
-              padding: 4,
-              borderRadius: 4,
+              padding: 6,
+              borderRadius: 6,
               display: 'flex',
               alignItems: 'center',
+              transition: 'background 0.15s ease',
             }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-subtle)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
             <X size={18} />
           </button>
         </div>
-        <div style={{ flex: 1, padding: 20, overflowY: 'auto' }}>{children}</div>
+        <div style={{ flex: 1, padding: 24, overflowY: 'auto' }}>{children}</div>
       </div>
     </div>
   );

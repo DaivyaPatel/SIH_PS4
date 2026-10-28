@@ -31,7 +31,7 @@ export function PipelineFunnelChart({ summary }: PipelineFunnelChartProps) {
       key: 'intake',
       label: 'Stage 1: Intake & Registration',
       count: intakeCount,
-      color: 'var(--text-secondary)',
+      color: 'var(--text-muted)',
       filterParam: 'SUBMITTED',
     },
     {
@@ -69,12 +69,12 @@ export function PipelineFunnelChart({ summary }: PipelineFunnelChartProps) {
       style={{
         background: 'var(--bg-surface)',
         border: '1px solid var(--border)',
-        borderRadius: 8,
-        padding: '18px 20px',
-        boxShadow: 'var(--shadow-sm)',
+        borderRadius: 10,
+        padding: '20px 22px',
+        boxShadow: 'var(--shadow-card)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 14,
+        gap: 16,
         flex: 1,
       }}
     >
@@ -94,8 +94,9 @@ export function PipelineFunnelChart({ summary }: PipelineFunnelChartProps) {
             fontWeight: 600,
             color: 'var(--text-muted)',
             background: 'var(--bg-subtle)',
-            padding: '2px 8px',
-            borderRadius: 4,
+            border: '1px solid var(--border)',
+            padding: '3px 10px',
+            borderRadius: 9999,
           }}
         >
           {total} Active Cases
@@ -115,9 +116,9 @@ export function PipelineFunnelChart({ summary }: PipelineFunnelChartProps) {
                 cursor: 'pointer',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 4,
-                padding: '4px 6px',
-                borderRadius: 6,
+                gap: 5,
+                padding: '6px 8px',
+                borderRadius: 8,
                 transition: 'background 0.15s ease',
               }}
               onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-subtle)')}
@@ -126,16 +127,16 @@ export function PipelineFunnelChart({ summary }: PipelineFunnelChartProps) {
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
                 <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{stg.label}</span>
                 <span className="tabular-nums" style={{ color: 'var(--text-secondary)' }}>
-                  <strong>{stg.count}</strong> ({percent}%)
+                  <strong style={{ color: 'var(--text-primary)' }}>{stg.count}</strong> ({percent}%)
                 </span>
               </div>
 
               {/* Progress track */}
               <div
                 style={{
-                  height: 10,
+                  height: 8,
                   background: 'var(--bg-subtle)',
-                  borderRadius: 5,
+                  borderRadius: 9999,
                   overflow: 'hidden',
                   border: '1px solid var(--border)',
                 }}
@@ -145,7 +146,7 @@ export function PipelineFunnelChart({ summary }: PipelineFunnelChartProps) {
                     height: '100%',
                     width: `${Math.max(percent, stg.count > 0 ? 3 : 0)}%`,
                     background: stg.color,
-                    borderRadius: 5,
+                    borderRadius: 9999,
                     transition: 'width 0.4s ease',
                   }}
                 />

@@ -41,8 +41,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const border = isPrimary || isDestructive || isGhost ? 'none' : '1px solid var(--border-strong)';
 
     const padding =
-      size === 'sm' ? '6px 10px' : size === 'lg' ? '12px 20px' : '8px 14px';
-    const fontSize = size === 'sm' ? 12 : size === 'lg' ? 15 : 13;
+      size === 'sm' ? '6px 12px' : size === 'lg' ? '11px 22px' : '8px 16px';
+    const fontSize = size === 'sm' ? 12 : size === 'lg' ? 14 : 13;
 
     return (
       <button
@@ -57,14 +57,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           background: bg,
           color,
           border,
-          borderRadius: 6,
+          borderRadius: 8,
           padding,
           fontSize,
-          fontWeight: 500,
+          fontWeight: 600,
           cursor: disabled || isLoading ? 'not-allowed' : 'pointer',
           opacity: disabled || isLoading ? 0.6 : 1,
-          transition: 'all 0.15s ease',
-          boxShadow: isPrimary || isDestructive ? 'var(--shadow-sm)' : 'none',
+          transition: 'background 0.15s ease, border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease',
+          boxShadow: isPrimary ? '0 1px 3px rgba(37, 99, 235, 0.25)' : isDestructive ? '0 1px 3px rgba(220, 38, 38, 0.25)' : 'var(--shadow-sm)',
           whiteSpace: 'nowrap',
           ...style,
         }}

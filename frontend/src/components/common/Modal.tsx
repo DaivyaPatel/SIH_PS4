@@ -13,6 +13,7 @@ interface ModalProps {
 
 export function Modal({ isOpen, onClose, title, subtitle, children, maxWidth, size = 'md' }: ModalProps) {
   const effectiveMaxWidth = maxWidth || (size === 'sm' ? 420 : size === 'lg' ? 680 : 520);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
@@ -51,8 +52,8 @@ export function Modal({ isOpen, onClose, title, subtitle, children, maxWidth, si
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'rgba(0, 0, 0, 0.45)',
-          backdropFilter: 'blur(2px)',
+          background: 'rgba(0, 0, 0, 0.55)',
+          backdropFilter: 'blur(4px)',
         }}
       />
       {/* Content */}
@@ -63,12 +64,13 @@ export function Modal({ isOpen, onClose, title, subtitle, children, maxWidth, si
           maxWidth: effectiveMaxWidth,
           background: 'var(--bg-surface)',
           border: '1px solid var(--border)',
-          borderRadius: 8,
+          borderRadius: 12,
           boxShadow: 'var(--shadow-lg)',
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
           maxHeight: '90vh',
+          animation: 'fadeIn 0.15s ease-out',
         }}
       >
         <div
@@ -76,12 +78,12 @@ export function Modal({ isOpen, onClose, title, subtitle, children, maxWidth, si
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '16px 20px',
+            padding: '18px 24px',
             borderBottom: '1px solid var(--border)',
           }}
         >
           <div>
-            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: 'var(--text-primary)' }}>
+            <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'var(--text-primary)' }}>
               {title}
             </h3>
             {subtitle && (
@@ -98,16 +100,19 @@ export function Modal({ isOpen, onClose, title, subtitle, children, maxWidth, si
               border: 0,
               color: 'var(--text-secondary)',
               cursor: 'pointer',
-              padding: 4,
-              borderRadius: 4,
+              padding: 6,
+              borderRadius: 6,
               display: 'flex',
               alignItems: 'center',
+              transition: 'background 0.15s ease',
             }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-subtle)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
             <X size={18} />
           </button>
         </div>
-        <div style={{ padding: 20, overflowY: 'auto' }}>{children}</div>
+        <div style={{ flex: 1, padding: 24, overflowY: 'auto' }}>{children}</div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, RefreshCw } from 'lucide-react';
+import { ArrowRight, RefreshCw, Network } from 'lucide-react';
 import { getDashboardSummary, getCases, getCaseById } from '../lib/api';
 import { useRegion } from '../context/RegionContext';
 import { useRole } from '../context/RoleContext';
@@ -26,6 +26,7 @@ export function HomeRoute() {
   const [primaryCaseDetail, setPrimaryCaseDetail] = useState<CaseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showTopology, setShowTopology] = useState(false);
 
   const loadDashboardData = () => {
     setLoading(true);
@@ -58,15 +59,16 @@ export function HomeRoute() {
   }, [selectedRegion]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       {/* Header Banner */}
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           flexWrap: 'wrap',
           gap: 16,
+          paddingBottom: 4,
         }}
       >
         <div>
@@ -76,7 +78,7 @@ export function HomeRoute() {
               fontWeight: 700,
               color: 'var(--text-primary)',
               margin: '0 0 4px',
-              letterSpacing: '-0.01em',
+              letterSpacing: '-0.02em',
             }}
           >
             Approval Coordination Dashboard
@@ -128,12 +130,12 @@ export function HomeRoute() {
       {/* Loading Skeletons */}
       {loading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} style={{ padding: 16, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 8 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} style={{ padding: 16, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10 }}>
                 <Skeleton height={14} width="60%" />
-                <div style={{ height: 8 }} />
-                <Skeleton height={28} width="40%" />
+                <div style={{ height: 12 }} />
+                <Skeleton height={32} width="40%" />
               </div>
             ))}
           </div>
@@ -141,7 +143,6 @@ export function HomeRoute() {
             <Skeleton height={260} />
             <Skeleton height={260} />
           </div>
-          <Skeleton height={320} />
         </div>
       )}
 
@@ -190,16 +191,78 @@ export function HomeRoute() {
             <NeedsAttentionQueue cases={cases} role={role} />
           )}
 
-          {/* Interactive 5-Column Relationship Topology Graph for Primary Active Case */}
+          {/* Interactive 5-Column Relationship Topology Section (Cleanly Expandable) */}
           {primaryCaseDetail && (
-            <div style={{ marginTop: 4 }}>
-              <RelationshipGraphCanvas
-                data={buildGraphDataFromCase(primaryCaseDetail)}
-                height={460}
-                title={`Topological Relationship Graph · ${primaryCaseDetail.applicationNumber}`}
-                subtitle={`Explorable 5-column statutory compliance dependency map for ${primaryCaseDetail.institution.name}`}
-                onRefresh={loadDashboardData}
-              />
+            <div
+              style={{
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 10,
+                boxShadow: 'var(--shadow-card)',
+                overflow: 'hidden',
+                transition: 'box-shadow 0.2s ease',
+              }}
+            >
+              <div
+                style={{
+                  padding: '16px 22px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                  background: showTopology ? 'var(--bg-subtle)' : 'var(--bg-surface)',
+                  borderBottom: showTopology ? '1px solid var(--border)' : 'none',
+                }}
+                onClick={() => setShowTopology(prev => !prev)}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      background: 'var(--accent-subtle)',
+                      color: 'var(--accent)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Network size={17} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
+                      Institutional Relationship Topology · {primaryCaseDetail.applicationNumber}
+                    </h3>
+                    <p style={{ margin: '2px 0 0', fontSize: 12, color: 'var(--text-secondary)' }}>
+                      5-column statutory compliance dependency trace for {primaryCaseDetail.institution.name}
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={e => {
+                    e.stopPropagation();
+                    setShowTopology(prev => !prev);
+                  }}
+                >
+                  {showTopology ? 'Hide Topology Graph ▴' : 'Explore Topology Graph ▾'}
+                </Button>
+              </div>
+
+              {showTopology && (
+                <div style={{ padding: 16 }}>
+                  <RelationshipGraphCanvas
+                    data={buildGraphDataFromCase(primaryCaseDetail)}
+                    height={460}
+                    title={`Topological Relationship Graph · ${primaryCaseDetail.applicationNumber}`}
+                    subtitle={`Explorable 5-column statutory compliance dependency map for ${primaryCaseDetail.institution.name}`}
+                    onRefresh={loadDashboardData}
+                  />
+                </div>
+              )}
             </div>
           )}
         </>

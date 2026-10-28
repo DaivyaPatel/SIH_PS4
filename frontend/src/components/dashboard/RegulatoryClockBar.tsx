@@ -24,7 +24,7 @@ export function RegulatoryClockBar({ summary }: RegulatoryClockBarProps) {
       label: 'On Track',
       count: onTrack,
       percent: onTrackPct,
-      color: 'var(--status-ok)',
+      color: 'var(--status-ok-solid)',
       bg: 'var(--status-ok-tint)',
       border: 'var(--status-ok-border)',
       filter: 'ON_TRACK',
@@ -34,7 +34,7 @@ export function RegulatoryClockBar({ summary }: RegulatoryClockBarProps) {
       label: 'Approaching Deadline',
       count: approaching,
       percent: approachingPct,
-      color: 'var(--status-warn)',
+      color: 'var(--status-warn-solid)',
       bg: 'var(--status-warn-tint)',
       border: 'var(--status-warn-border)',
       filter: 'APPROACHING_DEADLINE',
@@ -44,7 +44,7 @@ export function RegulatoryClockBar({ summary }: RegulatoryClockBarProps) {
       label: 'Overdue / Breached',
       count: overdue,
       percent: overduePct,
-      color: 'var(--status-bad)',
+      color: 'var(--status-bad-solid)',
       bg: 'var(--status-bad-tint)',
       border: 'var(--status-bad-border)',
       filter: 'OVERDUE',
@@ -57,12 +57,12 @@ export function RegulatoryClockBar({ summary }: RegulatoryClockBarProps) {
       style={{
         background: 'var(--bg-surface)',
         border: '1px solid var(--border)',
-        borderRadius: 8,
-        padding: '18px 20px',
-        boxShadow: 'var(--shadow-sm)',
+        borderRadius: 10,
+        padding: '20px 22px',
+        boxShadow: 'var(--shadow-card)',
         display: 'flex',
         flexDirection: 'column',
-        gap: 14,
+        gap: 16,
         flex: 1,
       }}
     >
@@ -78,7 +78,7 @@ export function RegulatoryClockBar({ summary }: RegulatoryClockBarProps) {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Clock size={15} style={{ color: 'var(--text-muted)' }} />
+          <Clock size={14} style={{ color: 'var(--text-muted)' }} />
           <span className="tabular-nums" style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 600 }}>
             {total} Cases Monitored
           </span>
@@ -88,10 +88,10 @@ export function RegulatoryClockBar({ summary }: RegulatoryClockBarProps) {
       {/* Stacked Single Horizontal Bar */}
       <div
         style={{
-          height: 18,
+          height: 12,
           width: '100%',
           display: 'flex',
-          borderRadius: 6,
+          borderRadius: 9999,
           overflow: 'hidden',
           background: 'var(--bg-subtle)',
           border: '1px solid var(--border)',
@@ -142,30 +142,30 @@ export function RegulatoryClockBar({ summary }: RegulatoryClockBarProps) {
             key={seg.label}
             onClick={() => navigate(`/cases?deadline=${seg.filter}`)}
             style={{
-              background: 'var(--bg-page)',
+              background: 'var(--bg-subtle)',
               border: '1px solid var(--border)',
-              borderRadius: 6,
+              borderRadius: 8,
               padding: '10px 12px',
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
               gap: 4,
-              transition: 'border-color 0.15s ease, background 0.15s ease',
+              transition: 'border-color 0.15s ease, background 0.15s ease, transform 0.15s ease',
             }}
             onMouseEnter={e => {
               e.currentTarget.style.borderColor = seg.color;
-              e.currentTarget.style.background = 'var(--bg-subtle)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
             }}
             onMouseLeave={e => {
               e.currentTarget.style.borderColor = 'var(--border)';
-              e.currentTarget.style.background = 'var(--bg-page)';
+              e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div
                 style={{
-                  width: 8,
-                  height: 8,
+                  width: 7,
+                  height: 7,
                   borderRadius: '50%',
                   background: seg.color,
                   flexShrink: 0,
@@ -176,7 +176,7 @@ export function RegulatoryClockBar({ summary }: RegulatoryClockBarProps) {
               </span>
             </div>
 
-            <div className="tabular-nums" style={{ fontSize: 16, fontWeight: 700, color: seg.color }}>
+            <div className="tabular-nums" style={{ fontSize: 18, fontWeight: 700, color: seg.color }}>
               {seg.count} <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)' }}>({seg.percent}%)</span>
             </div>
 
@@ -192,16 +192,19 @@ export function RegulatoryClockBar({ summary }: RegulatoryClockBarProps) {
           style={{
             background: 'var(--status-bad-tint)',
             border: '1px solid var(--status-bad-border)',
-            borderRadius: 6,
-            padding: '8px 12px',
+            borderRadius: 8,
+            padding: '10px 14px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             cursor: 'pointer',
+            transition: 'background 0.15s ease',
           }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239, 68, 68, 0.18)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'var(--status-bad-tint)')}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <ShieldAlert size={15} style={{ color: 'var(--status-bad-text)' }} />
+            <ShieldAlert size={16} style={{ color: 'var(--status-bad-text)' }} />
             <span style={{ fontSize: 12, color: 'var(--status-bad-text)', fontWeight: 600 }}>
               {clocks.totalEscalationsDispatched} Statutory Escalations Dispatched to Officers
             </span>

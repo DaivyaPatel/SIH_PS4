@@ -300,20 +300,20 @@ export function RelationshipGraphCanvas({
 
             <button
               type="button"
-              disabled
+              onClick={() => setMode('IMPACT')}
               style={{
-                padding: '4px 8px',
+                padding: '4px 10px',
                 border: 'none',
                 borderRadius: 4,
-                background: 'transparent',
-                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                background: mode === 'IMPACT' ? 'var(--bg-surface)' : 'transparent',
+                color: mode === 'IMPACT' ? 'var(--accent)' : 'var(--text-secondary)',
                 fontSize: 11,
-                cursor: 'not-allowed',
-                opacity: 0.6,
+                fontWeight: mode === 'IMPACT' ? 700 : 500,
+                boxShadow: mode === 'IMPACT' ? 'var(--shadow-sm)' : 'none',
               }}
-              title="Impact simulation coming in regulatory release 2.1"
             >
-              Impact (Coming Soon)
+              Impact Simulation
             </button>
           </div>
 
