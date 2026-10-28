@@ -67,3 +67,4 @@ export function StageStepper({ status, hasDeficiencyWarning = false }: StageStep
     </div>
   );
 }
+

@@ -46,7 +46,10 @@ export function Drawer({ isOpen, onClose, title, subtitle, children, width, size
     >
       {/* Backdrop */}
       <div
-        onClick={onClose}
+        onClick={e => {
+          e.stopPropagation();
+          onClose();
+        }}
         style={{
           position: 'absolute',
           inset: 0,
@@ -56,6 +59,7 @@ export function Drawer({ isOpen, onClose, title, subtitle, children, width, size
       />
       {/* Slide-over panel */}
       <div
+        onClick={e => e.stopPropagation()}
         style={{
           position: 'relative',
           width: '100%',
@@ -90,7 +94,12 @@ export function Drawer({ isOpen, onClose, title, subtitle, children, width, size
             )}
           </div>
           <button
-            onClick={onClose}
+            type="button"
+            onClick={e => {
+              e.stopPropagation();
+              e.preventDefault();
+              onClose();
+            }}
             aria-label="Close drawer"
             style={{
               background: 'transparent',

@@ -221,10 +221,10 @@ export function RelationshipGraphCanvas({
       style={{
         background: 'var(--bg-surface)',
         border: '1px solid var(--border)',
-        borderRadius: 8,
+        borderRadius: 'var(--radius-md)',
         display: 'flex',
         flexDirection: 'column',
-        boxShadow: 'var(--shadow-sm)',
+        boxShadow: 'none',
         overflow: 'hidden',
         position: 'relative',
       }}

@@ -72,3 +72,4 @@ describe('Case Logic & Consistency Specification (Officer-Grade)', () => {
     expect(sorted[1].applicationNumber).toBe('APP-2026-WRO-001');
   });
 });
+

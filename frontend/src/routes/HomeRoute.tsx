@@ -1,13 +1,15 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { RefreshCw, AlertTriangle, Clock, X, ChevronDown, ChevronRight } from 'lucide-react';
-import { getCases } from '../lib/api';
+import { RefreshCw, AlertTriangle, Clock, X, ChevronDown, ChevronRight, Network } from 'lucide-react';
+import { getCases, getCaseById } from '../lib/api';
 import { useRole } from '../context/RoleContext';
 import { computeUnifiedMetrics, deriveCaseState, verifyDataConsistency, type ClockState } from '../lib/caseLogic';
 import { OfficerCaseTable } from '../components/common/OfficerCaseTable';
 import { CaseSidePanel } from '../components/common/CaseSidePanel';
 import { EscalationBanner } from '../components/common/EscalationBanner';
-import type { CaseSummary } from '../types/domain';
+import { RelationshipGraphCanvas } from '../components/graph/RelationshipGraphCanvas';
+import { buildGraphDataFromCase } from '../lib/graphData';
+import type { CaseSummary, CaseDetail } from '../types/domain';
 
 type ActiveSummaryFilter = 'overdue' | 'due_soon' | 'waiting_you' | 'waiting_others' | null;
 
@@ -36,6 +38,12 @@ export function HomeRoute() {
   // Side panel state
   const [selectedCase, setSelectedCase] = useState<CaseSummary | null>(null);
   const [originEl, setOriginEl] = useState<HTMLElement | null>(null);
+
+  // 2D Topology Graph state
+  const [graphCaseId, setGraphCaseId] = useState<string>('');
+  const [graphCaseDetail, setGraphCaseDetail] = useState<CaseDetail | null>(null);
+  const [loadingGraph, setLoadingGraph] = useState(false);
+  const [showGraph, setShowGraph] = useState(true);
 
   useEffect(() => {
     if (caseIdFromUrl && cases.length > 0) {
@@ -185,6 +193,29 @@ export function HomeRoute() {
       })
       .sort(sortByUrgency);
   }, [cases, derivedMap, summaryFilter, searchQuery, regionFilter, stageFilter, waitingFilter]);
+
+  // Sync 2D graph case data
+  useEffect(() => {
+    const targetId = graphCaseId || actionCases[0]?.id || cases[0]?.id;
+    if (!targetId) return;
+
+    if (!graphCaseId) {
+      setGraphCaseId(targetId);
+    }
+
+    setLoadingGraph(true);
+    getCaseById(targetId)
+      .then(d => {
+        setGraphCaseDetail(d);
+        setLoadingGraph(false);
+      })
+      .catch(() => setLoadingGraph(false));
+  }, [graphCaseId, cases, actionCases]);
+
+  const graphData = useMemo(() => {
+    if (!graphCaseDetail) return null;
+    return buildGraphDataFromCase(graphCaseDetail);
+  }, [graphCaseDetail]);
 
   const activeFiltersCount =
     (summaryFilter ? 1 : 0) +
@@ -553,6 +584,7 @@ export function HomeRoute() {
           onSelectCase={(c, el) => {
             setSelectedCase(c);
             setOriginEl(el || null);
+            setGraphCaseId(c.id);
           }}
           selectedCaseId={selectedCase?.id}
           emptyMessage="Nothing needs your action."
@@ -608,11 +640,114 @@ export function HomeRoute() {
             onSelectCase={(c, el) => {
               setSelectedCase(c);
               setOriginEl(el || null);
+              setGraphCaseId(c.id);
             }}
             selectedCaseId={selectedCase?.id}
             emptyMessage="No other active cases waiting on external parties."
             isQuieterSection={true}
           />
+        )}
+      </section>
+
+      {/* 6. 2D Topological Relationship Graph */}
+      <section style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 10,
+            padding: '8px 12px',
+            background: 'var(--bg-subtle)',
+            border: '1px solid var(--border)',
+            borderRadius: 'var(--radius-sm)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Network size={16} style={{ color: 'var(--accent)' }} />
+            <div>
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                Topological Relationship Graph (2D Compliance Topology)
+              </span>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 8 }}>
+                — 5-column statutory chain tracing regulatory evidence to decision
+              </span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <label htmlFor="graph-case-select" style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+              Application:
+            </label>
+            <select
+              id="graph-case-select"
+              value={graphCaseId}
+              onChange={e => setGraphCaseId(e.target.value)}
+              aria-label="Select application for 2D relationship graph"
+              style={{
+                padding: '4px 8px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-surface)',
+                color: 'var(--text-primary)',
+                fontSize: 12,
+                fontWeight: 500,
+                cursor: 'pointer',
+                maxWidth: 280,
+              }}
+            >
+              {cases.map(c => (
+                <option key={c.id} value={c.id}>
+                  {c.applicationNumber} — {c.institutionName}
+                </option>
+              ))}
+            </select>
+
+            <button
+              type="button"
+              onClick={() => setShowGraph(!showGraph)}
+              style={{
+                padding: '4px 8px',
+                borderRadius: 'var(--radius-sm)',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-surface)',
+                color: 'var(--text-secondary)',
+                fontSize: 12,
+                cursor: 'pointer',
+              }}
+            >
+              {showGraph ? 'Hide Graph ▴' : 'Show Graph ▾'}
+            </button>
+          </div>
+        </div>
+
+        {showGraph && graphData && (
+          <RelationshipGraphCanvas
+            data={graphData}
+            height={480}
+            title={`Topological Relationship Graph — ${graphCaseDetail?.applicationNumber}`}
+            subtitle={`Tracing statutory compliance neighbourhood for ${graphCaseDetail?.institution.name}`}
+            onRefresh={loadData}
+          />
+        )}
+
+        {showGraph && !graphData && loadingGraph && (
+          <div
+            style={{
+              height: 200,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--text-muted)',
+              fontSize: 12,
+            }}
+          >
+            Loading 2D topological graph…
+          </div>
         )}
       </section>
 
